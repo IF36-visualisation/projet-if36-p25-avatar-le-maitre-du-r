@@ -60,3 +60,7 @@ Avec ces nombreuses données et variables, de nombreuses pistes d'analyse sont p
 - Quels sont les catégories les plus populaire sur Steam?
 - Quel est la tendance des jeux sortis récemment ? (genre, jeux indépendants ou AAA, etc...)
 - Les avis Metacritics sont-elles corrélées avec les avis données par les joueurs sur la plateforme ?
+- Une corrélation est-elle identifiable entre les avis/note (Métacritics ou joueurs) et le temps de jeu ?
+- Etudier les langues disponibles selon les jeux des développeurs afin de potentiellement déceler des marchés/régions priorisés.
+- Quels sont les facteurs qui impactent globalement le prix ? (les genres/tags de jeux les plus chers, plus de langues disponibles <=> prix plus chers ?)
+- Déceler certains jeux avec un fort nombre de joueurs connectés et essayez de l'associer à un évènement à ce moment (octobre 2024) qui explique ce nombre élevé : mise à jour conséquente, évènement d'influenceur relançant l'intérêt pour le jeu, ...
