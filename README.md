@@ -57,10 +57,34 @@ Description des fichiers et de leur contenu :
 Nous tenons à éviter de reproduire les mêmes analyses et visualisations que NewbieIndieGameDev disponible sur ce lien :  [Vidéo sur l'analyse des données par NewbieindieGameDev](https://www.youtube.com/watch?v=qiNv3qv-YbU)
 
 Avec ces nombreuses données et variables, de nombreuses pistes d'analyse sont possibles :
-- Quels sont les catégories les plus populaire sur Steam?
-- Quel est la tendance des jeux sortis récemment ? (genre, jeux indépendants ou AAA, etc...)
-- Les avis Metacritics sont-elles corrélées avec les avis données par les joueurs sur la plateforme ?
+### Notes et avis des joueurs
 - Une corrélation est-elle identifiable entre les avis/note (Métacritics ou joueurs) et le temps de jeu ?
-- Etudier les langues disponibles selon les jeux des développeurs afin de potentiellement déceler des marchés/régions priorisés.
+- Les avis Metacritics sont-elles corrélées avec les avis données par les joueurs sur la plateforme ?
+- Voir l'évolution des évaluations des joueurs des jeux AAA
+### Genres des jeux
+- Quels sont les catégories les plus populaires sur Steam actuellement ?
+- Quel est la tendance des jeux sortis récemment ? (genre, jeux indépendants ou AAA, etc...)
+### Jeux indépendants vs AAA
+- Les jeux indépendants obtiennent-ils des meilleures évaluations que les AAA ?
+- Quelle est la durée de vie d'un jeu indépendant comparée à un AAA? (on essayera de prendre des jeux avec des gerres assez similaires)
+- Les genres/tags des jeux indépendants sont-ils plus "innovants" que les AAA ? 
+### Prix
 - Quels sont les facteurs qui impactent globalement le prix ? (les genres/tags de jeux les plus chers, plus de langues disponibles <=> prix plus chers ?)
-- Déceler certains jeux avec un fort nombre de joueurs connectés et essayez de l'associer à un évènement à ce moment (octobre 2024) qui explique ce nombre élevé : mise à jour conséquente, évènement d'influenceur relançant l'intérêt pour le jeu, ...
+### Jeux en ligne
+- Quel est les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
+- Déceler certains jeux avec un fort nombre de joueurs connectés et essayez de l'associer à un évènement à ce moment (octobre 2024) qui explique ce nombre élevé : mise à jour conséquente, évènement d'influenceur relançant l'intérêt pour le jeu, etc...
+### Différences culturelles/géographique et leurs impacts
+- Etudier les langues disponibles selon les jeux des développeurs afin de potentiellement déceler des marchés/régions priorisés.
+
+## Variables à comparer/Visualisations à réaliser
+Voici une liste non exhaustive des variables comparées ainsi que les visualisations que l'on va réaliser :
+- Nombre de jeux par genre/catégorie, avec possibilité de filtrer par date de sortie pour analyser les tendances récentes.
+- Comparaison entre les scores Metacritic et les avis des utilisateurs sur Steam.
+- Corrélation entre le nombre de langues disponibles et le nombre de propriétaires d’un jeu.
+- Comparaison entre les jeux issus d’un studio indépendant et ceux d’un grand studio, en comparant l’évolution des ventes réalisées, le prix des jeux et les avis des joueurs (ex : les jeux du studio Supergiant Games vs Ubisoft).
+- Analyse des combinaisons de genres les plus fréquentes pour les jeux indépendants et les jeux AAA, afin de mettre en évidence des différences de positionnement.
+- Évolution des prix de lancement des jeux au fil du temps.
+
+## Problèmes et limitations
+- Le dataset que l'on a choisit est un "snapshot" du SteamLibrary datant d'octobre 2024. On ne pourra pas réaliser de comparaisons dans le temps à part dans certains rares cas où les variables nous le permettent (prix initial d'un jeu, etc...)
+- Pour certaines données notamment provenant de SteamSpy, ce sont des estimations donc les analyses sur ces données perdront une certaine précision
