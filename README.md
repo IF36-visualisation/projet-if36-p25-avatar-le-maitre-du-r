@@ -64,6 +64,10 @@ Avec ces nombreuses données et variables, de nombreuses pistes d'analyse sont p
 ### Genres des jeux
 - Quels sont les catégories les plus populaires sur Steam actuellement ?
 - Quel est la tendance des jeux sortis récemment ? (genre, jeux indépendants ou AAA, etc...)
+- Observer l'évolution des genres de jeu sorties pour déceler des "modes" et période où certains genre de jeux était les plus populaires ?
+- À partir des résultats de l'observation précédente essayer de comprendre une montée ou baisse des genres.
+  - Exemple (simple) : est-ce que la croissance du genre battle royale peut-être corréler/causé avec la sortie du jeu Fortnite
+  - Exemple (complexe) : Peut-on observer une corrélation entre la sortie de jeux en ligne et le déploiement d'internet dans le monde (nécessite de trouver des données sur le déploiement d'internet)
 ### Jeux indépendants vs AAA
 - Les jeux indépendants obtiennent-ils des meilleures évaluations que les AAA ?
 - Quelle est la durée de vie d'un jeu indépendant comparée à un AAA? (on essayera de prendre des jeux avec des gerres assez similaires)
