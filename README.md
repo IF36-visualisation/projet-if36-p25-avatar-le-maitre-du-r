@@ -74,6 +74,8 @@ Avec ces nombreuses données et variables, de nombreuses pistes d'analyse sont p
 - Les genres/tags des jeux indépendants sont-ils plus "innovants" que les AAA ? 
 ### Prix
 - Quels sont les facteurs qui impactent globalement le prix ? (les genres/tags de jeux les plus chers, plus de langues disponibles <=> prix plus chers ?)
+- Comparer des jeux avec des avis/notes similaires mais des prix différents pour voir si le temps de jeu moyen est impacté (est-ce que le prix peut influer le joueur à plus jouer pour le "rentabiliser")
+- Comparer les moyennes des prix des jeux par développeurs / studio de développement, pour potentiellement identifier des stratégies économiques chez certains.
 ### Jeux en ligne
 - Quel est les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
 - Déceler certains jeux avec un fort nombre de joueurs connectés et essayez de l'associer à un évènement à ce moment (octobre 2024) qui explique ce nombre élevé : mise à jour conséquente, évènement d'influenceur relançant l'intérêt pour le jeu, etc...
