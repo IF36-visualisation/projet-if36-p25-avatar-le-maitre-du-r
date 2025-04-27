@@ -1,0 +1,129 @@
+---
+title: "rapport_analyse_indie_aaa"
+author: "Paul Lassasseigne"
+date: "2025-04-25"
+output: html_document
+---
+
+# Introduction
+
+L'industrie du jeu vidéo traverse une période compliquée depuis plusieurs années. Les plus grosses entreprises du milieu enchaînent des polémiques entre licencements intensifs, management toxique et jeux très moyens aux yeux de la critique dont les prix ne cessent d'augmenter.
+
+**Qu'est ce qu'un jeu AAA ?**
+
+C'est un terme utilisé pour classifier les jeux vidéo dotés de budgets de développement et de promotion élevés. Ce sont donc des jeux censés présenter de grandes qualités.
+
+Cependant, les productions AAA font face à plusieurs critiques récurrentes telles que le manque d'innovation, une uniformisation des contenus, ou encore des pratiques commerciales controversées (microtransactions, loot boxes, DLC abusifs).
+
+À l'opposé, les jeux indépendants sont souvent développés par des équipes réduites ou par des développeurs individuels disposant de moyens financiers et techniques limités. Ce contexte leur permet généralement une plus grande liberté créative, donnant naissance à des jeux originaux, audacieux et parfois innovants.
+
+## Problématique
+
+Face à ce contexte qui oppose budget et innovation, une question se soulève quant à la qualité des jeux auprès du grand public :
+
+> Les jeux indépendants obtiennent-ils de meilleures évaluations que les AAA ?
+
+## Chargement et préparation des données
+
+Afin de réaliser l'analyse, on va utiliser les fichiers [raw_reviews.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/raw_reviews.csv) et [tags.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/tags.csv) qui seront suffisants. Les deux fichiers sont reliés par app_id, tags.csv va nous permettre de séparer les jeux par le groupe des jeux indépendants et celui des jeux AAA, et raw_reviews.csv va nous permettre d'obtenir les notes attribuées pour chaque jeu. 
+
+```{r import, message=FALSE, warning=FALSE}
+library(dplyr)
+library(readr)
+library(tidyr)
+library(ggplot2)
+
+reviews <- read_csv("data/raw_reviews.csv")
+tags <- read_csv("data/tags.csv")
+```
+
+## Préparation des jeux
+
+Steam possède un tag spécialement pour les jeux indépendants, qui se nomme "Indie". Ce n'est pas le cas pour les jeux AAA. Cependant, on peut facilement les obtenir en récupérant l'ensemble des jeux, puis en enlevant les jeux indépendants :
+
+```{r}
+indie_games <- tags %>%
+  mutate(app_id = as.character(app_id)) %>%
+  filter(tag == "Indie") %>%
+  distinct(app_id) %>%
+  mutate(type_game = "Indépendant")
+
+aaa_games <- tags %>%
+  mutate(app_id = as.character(app_id)) %>%
+  anti_join(indie_games, by = "app_id") %>%
+  distinct(app_id) %>%
+  mutate(type_game = "AAA")
+
+nrow(indie_games)
+nrow(aaa_games)
+
+types_games <- bind_rows(indie_games, aaa_games)
+```
+
+Par la suite, on peut tout mettre dans un nouveau dataset nommé types_games qui recense l'ensemble des jeux avec leur catégorie propre.
+
+## Préparation des évaluations
+
+Pour les évaluations, on va créer un nouveau dataset avec seulement les informations dont nous avons besoin, c'est à dire app_id et review_score_description. On va ensuite filtrer review_score_description afin d'obtenir seulement les jeux qui ont une évaluation. La colonne peut avoir d'autres valeurs, comme "None", "1 user reviews" etc... car Steam attribue une évaluation à un jeu seulement à partir d'un certain nombre d'évaluations de la part de la communauté.
+
+```{r}
+evaluations <- reviews %>%
+  filter(review_score_description %in% c(
+    "Very Negative", "Mostly Negative", "Mixed",
+    "Mostly Positive", "Very Positive", "Overwhelmingly Positive"
+  )) %>%
+  select(app_id, review_score_description) %>%
+  inner_join(types_games, by = "app_id")
+```
+
+## Visualisation
+
+Enfin, pour la visualisation de nos données, on s'est orienté sur un diagramme à barres. L'objectif est de comparer directement les types de jeu selon le niveau d'évaluation.
+
+```{r}
+evaluations %>%
+  mutate(review_score_description = factor(review_score_description, levels = c("Very Negative", "Mostly Negative", "Mixed", "Mostly Positive", "Very Positive", "Overwhelmingly Positive"))) %>%
+  count(review_score_description, type_game) %>%
+  ggplot(aes(x = review_score_description, y = n, fill = type_game)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("Indépendant" = "red", "AAA" = "blue")) +
+  labs(
+    title = "Répartition du nombre de jeux par évaluation et par type",
+    x = "Niveau d'évaluation",
+    y = "Nombre de jeux",
+    fill = "Type de jeu"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Le problème est que ce n'est pas égal de faire la comparaison actuellement. Comme on peut le voir plus au dessus grâce à la fonction nrow, aaa_games possède 54 252 jeux, tandis que indie_games en possède 63 253. On va donc faire une moyenne globale pour être au même niveau.
+
+La fonction geom_bar nous permet de définir l'option "position = dodge" afin d'avoir les barres côte à côte pour une meilleure lisibilité.
+
+```{r}
+evaluations %>%
+  mutate(review_score_description = factor(review_score_description, levels = c("Very Negative", "Mostly Negative", "Mixed", "Mostly Positive", "Very Positive", "Overwhelmingly Positive"))) %>%
+  count(review_score_description, type_game) %>%
+  group_by(type_game) %>%
+  mutate(percentage = n / sum(n) * 100) %>%
+  ggplot(aes(x = review_score_description, y = percentage, fill = type_game)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = sprintf("%.1f%%", percentage)), 
+          position = position_dodge(width = 1), 
+          vjust = -0.25, size = 3) +
+  scale_fill_manual(values = c("Indépendant" = "red", "AAA" = "blue")) +
+  labs(
+    title = "Répartition proportionnelle des évaluations par type de jeu",
+    x = "Niveau d'évaluation",
+    y = "Pourcentage de jeux",
+    fill = "Type de jeu"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Observations
+
+L'analyse du graphique montre que, proportionnellement, les jeux AAA obtiennent légèrement plus d'évaluations "Very Positive" que les jeux indépendants. Toutefois, les différences restent relativement faibles et la majorité des jeux indépendants se situent également dans des évaluations globalement positives. Les jeux indépendants affichent une proportion un peu plus élevée d'évaluations "Mixed", ce qui pourrait refléter une plus grande diversité de qualité au sein de cette catégorie. Cela amène à nuancer l'hypothèse initiale : si les jeux indépendants reçoivent beaucoup de bonnes évaluations, les jeux AAA conservent tout de même une légère avance en termes de perception positive moyenne sur Steam.
+
+Cette hypothèse vient du fait que aujourd'hui, les joueurs sont focalisés sur un léger pourcentage de jeux par rapport à l'entièreté du monde du jeu vidéo. Tous les jours de nouveaux jeux sortent, tous les jours il peut y en avoir d'excellents, mais ils ne feront pas le même bruit que les jeux colossaux développés par les grandes entreprises, comme Microsoft, Ubisoft, Activision Blizzard, Rockstar etc...
