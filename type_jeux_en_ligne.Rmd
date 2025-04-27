@@ -32,23 +32,37 @@ library(stringr)
 library(dplyr)
 
 # Regrouper les genres des fichiers categories et tags sous une même ligne
-tags <- read.csv("data/tags.csv") %>% group_by(app_id) %>% summarize(tags = paste(tag, collapse = ","))
-categories <- read.csv("data/categories.csv") %>% group_by(app_id) %>% summarize(categories = paste(category, collapse = ","))
+tags <- read.csv("data/tags.csv") %>% 
+  group_by(app_id) %>% 
+  summarize(tags = paste(tag, collapse = ","))
+
+categories <- read.csv("data/categories.csv") %>% 
+  group_by(app_id) %>% 
+  summarize(categories = paste(category, collapse = ","))
 
 # Importer les autres tableaux
 
 # Cas pour steamspy : initial price est intéressant mais price est déjà présent dans clean_games
 
 # On va enlever la colonne price et convertir la colonne initial_price pour qu'elle soit uitilisable
-steamspy <- read.csv("data/steamspy.csv") %>% select(-price, - languages) %>% mutate(initial_price = na_if(initial_price, "\\N"))
-initial_prices <- steamspy %>% transmute(initial_price_USD = ifelse(!is.na(initial_price), as.double(initial_price) / 100, NA))
-steamspy <- steamspy %>% cbind(initial_prices) %>% select(-initial_price)
+steamspy <- read.csv("data/steamspy.csv") %>% 
+  select(-price, - languages) %>% 
+  mutate(initial_price = na_if(initial_price, "\\N"))
+
+initial_prices <- steamspy %>% 
+  transmute(initial_price_USD = ifelse(!is.na(initial_price), as.double(initial_price) / 100, NA))
+
+steamspy <- steamspy %>% 
+  cbind(initial_prices) %>% 
+  select(-initial_price)
 
 # Import de clean_games
 clean_games <- read.csv("data/clean_games.csv", sep=";")
 
 # Créer un dataframe contenant toutes les informations en réalisant des jointures
-steamData <- left_join(clean_games, steamspy, by="app_id") %>% left_join(tags, by="app_id") %>% left_join(categories, by="app_id")
+steamData <- left_join(clean_games, steamspy, by="app_id") %>% 
+  left_join(tags, by="app_id") %>% 
+  left_join(categories, by="app_id")
 
 # Mettre les tags et catégories en lowercase pour les str_detect
 steamData <- steamData %>%
