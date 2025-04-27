@@ -19,7 +19,7 @@ Ce que l'on a à faire :
 
 - Tous les tableaux partagent une colonne commune : app_id, qui sera utilisée pour les jointures. On va alors créé un grand dataframe avec l'ensemble des variables que l'on veut exploiter.
 - Certaines colonnes nécessitent un nettoyage, notamment la colonne initial_price contenant parfois la valeur "\\N"
-- Regrouper les tags et les catégories sur une même ligne (meêm app_id) des fichiers tags.csv et categories.csv : les colonnes tags et categories seront des chaînes de caractères contenant l'ensemble des tags/catégories séparé chacun par une virgule
+- Regrouper les tags et les catégories sur une même ligne (même app_id) des fichiers tags.csv et categories.csv : les colonnes tags et categories seront des chaînes de caractères contenant l'ensemble des tags/catégories séparés chacun par une virgule
 - Convertir l'initial_price en une donnée exploitable dans steamspy.csv (ex : 999 veut dire 9.99 USD)
 
 ```{r init, echo=FALSE, include=FALSE}
@@ -44,7 +44,7 @@ categories <- read.csv("data/categories.csv") %>%
 
 # Cas pour steamspy : initial price est intéressant mais price est déjà présent dans clean_games
 
-# On va enlever la colonne price et convertir la colonne initial_price pour qu'elle soit uitilisable
+# On va enlever la colonne price et convertir la colonne initial_price pour qu'elle soit utilisable
 steamspy <- read.csv("data/steamspy.csv") %>% 
   select(-price, - languages) %>% 
   mutate(initial_price = na_if(initial_price, "\\N"))
@@ -86,13 +86,13 @@ Sur Steam, il existe deux types de variables qui permettent de classer les jeux 
 
 ## Contexte et problématique
 
-C'est sur la plateforme Steam que l'on a vu naître les premiers jeux en ligne et le dévelopement de celui-ci avec des jeux mythiques comme Counter Strike, Team Forteress, etc...
-D'autres types de jeu sont aussis devenus populaire au cours du temps comme les MMORPG, les Battle-Royale, etc...
+C'est sur la plateforme Steam que l'on a vu naître les premiers jeux en ligne et le développement de celui-ci avec des jeux mythiques comme Counter Strike, Team Forteress, etc...
+D'autres types de jeux sont aussi devenus populaires au cours du temps comme les MMORPG, les Battle-Royale, etc...
 Nous voulons voir les tendances actuelles et quels types de jeux attirent principalement les joueurs de Steam.
 
 Notre problématique est alors la suivante :
 
-Quel est les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
+Quels sont les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
 
 ## Définition de jeu en ligne
 
@@ -115,7 +115,7 @@ Le critère "popularité" sera basée sur le nombre de joueurs actifs en Octobre
 
 ### Types de jeux en ligne
 
-Pour analyser les type de jeux les plus populaires pour les jeux en ligne et de regarder sa distribution dans le magasin Steam, on va considérer les tags suivants uniquement :
+Pour analyser les type de jeux les plus populaires pour les jeux en ligne et regarder sa distribution dans le magasin Steam, on va considérer les tags suivants uniquement :
 
 - FPS Multijoueur
 - Battle Royale
@@ -185,13 +185,13 @@ On voit que le genre de jeu en ligne le plus populaire sur Steam est le FPS Mult
 
 Ensuite, dans la catégorie "Autres", On y compte 1,3 millions joueurs sur des jeux comme Liar's Bar, War Thunder, Civizilation VI, Forza Horizon et Eurotruck Simulator 2. C'est une catégorie regroupant pleins de genres différents.
 
-Ensuite, les Battle Royale occupent rassemble 1 million de joueurs (environ 16,5% des joueurs). Le genre semble être resté populaire mais elle n'a pu la même popularité qu'entre 2018-2020.
+Ensuite, les Battle Royale rassemble 1 million de joueurs (environ 16,5% des joueurs). Le genre semble être resté populaire mais elle n'a plus la même popularité qu'entre 2018-2020.
 
-Les RPG en ligne représente 1.2 million de joueurs mais il faut distinguer les différents genre de RPG en ligne.
+Les RPG en ligne représentent 1.2 million de joueurs mais il faut distinguer les différents genre de RPG en ligne.
 
 En effet, dans les RPG en ligne, ils se trouvent les MMO comme Monster Hunter: World, New World: Aeternum ou Destiny 2 mais également des RPG qui peut se jouer en coopération comme Stardew Valley, Baldur's Gate 3, etc...
 
-Voici la répartition des joueurs jouant à des MMORPG et des joueurs d'RPG classique : 
+Voici la répartition des joueurs jouant à des MMORPG et des joueurs de RPG classique : 
 
 ```{r mmo_vs_classicRPG, echo=FALSE, fig.align='center'}
 # Filtrer les jeux RPG en ligne et ajouter une colonne is_MMO
@@ -236,17 +236,17 @@ ggplot(proportions_globales, aes(x = "", y = proportion, fill = is_MMO)) +
 
 Note : Stardew Valley a le tag RPG et est un jeu qui peut se jouer en multijoueur mais peut-on considérer comme un jeu en ligne ? C'est le cas d'autres jeux principalement singleplayer mais qui peut se jouer en multijoueur.
 
-Les Survival Multijoueur représente une base de 800 000 joueurs sur des jeux fars comme Rust, Factorio, Satisfactory, etc...
+Les Survival Multijoueur représentent une base de 800 000 joueurs sur des jeux phares comme Rust, Factorio, Satisfactory, etc...
 
-Enfin, les MOBA représente uniquement moins de 550 000 joueurs dont la majorité des joueurs viennent de Dota 2 (500 000 joueurs).
+Enfin, les MOBA représentent uniquement moins de 550 000 joueurs dont la majorité des joueurs viennent de Dota 2 (500 000 joueurs).
 
 ### Limites de résultats obtenus
 
-- Les tags Steam et les catégories crées ne sont pas assez précise pour trouver les jeux en ligne car on se retrouve souvent à la frontière d'un jeu avec un système multijoueur et un jeu en ligne.
+- Les tags Steam et les catégories créées ne sont pas assez précises pour trouver les jeux en ligne car on se retrouve souvent à la frontière d'un jeu avec un système multijoueur et un jeu en ligne.
 
-- D'autres visualisations au sein des catégories nous permettraient de voir qu'uniquement quelques jeux portent la base de jeu de certain type de jeu comme CS 2 pour les FPS et Dota 2 pour les MOBA.
+- D'autres visualisations au sein des catégories nous permettraient de voir qu'uniquement quelques jeux portent la base de jeu de certains types de jeux comme CS 2 pour les FPS et Dota 2 pour les MOBA.
 
-- Le fait que la catégorie "Autres" possèdent de nombreux jeux en ligne que l'on a pas pu classer montre que le domaine des jeux en ligne est très variée et non cantonnée aux genres que l'on pense habituellement. Globalement, réaliser une classication sur l'ensemble des jeux Steam semble difficile tant certains jeux sont assez particulier pour les catégoriser.
+- Le fait que la catégorie "Autres" possèdent de nombreux jeux en ligne que l'on a pas pu classer montre que le domaine des jeux en ligne est très variée et non cantonnée aux genres que l'on pense habituellement. Globalement, réaliser une classification sur l'ensemble des jeux Steam semble difficile tant certains jeux sont assez particulier pour les catégoriser.
 
-- Enfin, il faut être conscient que ces données ne concernent que les utilisateurs Steam et non la globalité des joueurs. Par exemple, pour les MMORPG, ceux-ci peuvent être lancé hors Steam. De plus avec l'avènement de l'Epic Game Store, une partie des jeux sont passés sur l'autre plateforme comme Rocket League.
+- Enfin, il faut être conscient que ces données ne concernent que les utilisateurs Steam et non la globalité des joueurs. Par exemple, pour les MMORPG, ceux-ci peuvent être lancés hors Steam. De plus avec l'avènement de l'Epic Game Store, une partie des jeux sont passés sur l'autre plateforme comme Rocket League.
 
