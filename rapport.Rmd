@@ -7,32 +7,24 @@ output: html_document
 
 ### Membres du groupe
 
-- Hoang-Viêt LE
-- Paul LASSASSEIGNE
-- Jules PERRIN
-- Florian LOPITAUX
+-   Hoang-Viêt LE
+-   Paul LASSASSEIGNE
+-   Jules PERRIN
+-   Florian LOPITAUX
 
 # Données
 
-Dans le cadre de notre projet, nous avons choisi d'étudier divers jeux de données autour du catalogue de jeux Steam.
-Les datasets utilisés lors de ce projet sont les suivants :
-- [Dataset de NewbieIndieGameDev datant d'Octobre 2024](https://github.com/NewbieIndieGameDev/steam-insights) (140 000 jeux recensés)
+Dans le cadre de notre projet, nous avons choisi d'étudier divers jeux de données autour du catalogue de jeux Steam. Les datasets utilisés lors de ce projet sont les suivants : - [Dataset de NewbieIndieGameDev datant d'Octobre 2024](https://github.com/NewbieIndieGameDev/steam-insights) (140 000 jeux recensés)
 
-Les datasets sont sous format de différents fichiers csv. Cependant, NewbieIndieGameDev utilisant probablement un logiciel tiers pour
-manipuler ses données, certains csv sont mal formatés et imparsables par un programme (données json dans une colonne, balises html, ...). <br>
-Nous devons donc les modifier au préalable. Nous avons déjà "reformaté" le fichier **games.csv** afin de le rendre lisible par nos
-programmes et vérifier que nous sommes bien capables de les traiter pour notre projet. <br>
-Ainsi dans le dossier data : pour chaque fichier qui possède ce problème, il y aura un fichier **raw_<nom_du_fichier>.csv** qui sont les données brutes ("illisibles") et **clean_<nom_du_fichier>.csv** qui sont les données reformatées pour qu'elles soient "lisibles".
+Les datasets sont sous format de différents fichiers csv. Cependant, NewbieIndieGameDev utilisant probablement un logiciel tiers pour manipuler ses données, certains csv sont mal formatés et imparsables par un programme (données json dans une colonne, balises html, ...). <br> Nous devons donc les modifier au préalable. Nous avons déjà "reformaté" le fichier **games.csv** afin de le rendre lisible par nos programmes et vérifier que nous sommes bien capables de les traiter pour notre projet. <br> Ainsi dans le dossier data : pour chaque fichier qui possède ce problème, il y aura un fichier **raw\_**<nom_du_fichier>.csv qui sont les données brutes ("illisibles") et **clean\_**<nom_du_fichier>.csv qui sont les données reformatées pour qu'elles soient "lisibles".
 
-Ces datasets possèdent de nombreuses variables. Nous allons nous concentrer sur ceux qui nous semblent assez pertinentes à analyser.
-Description des fichiers et de leur contenu :
+Ces datasets possèdent de nombreuses variables. Nous allons nous concentrer sur ceux qui nous semblent assez pertinentes à analyser. Description des fichiers et de leur contenu :
 
 -   **`games.csv`** : regroupe les métadonnées des jeux, notamment :
     -   `app_id` (*discrètes*) : identifiant unique du jeu sur Steam
     -   `name` (*nominales*) : titre du jeu
     -   `price` (*continues*) : prix d'achat
     -   `languages` (*nominales*) : les langues disponibles sur le jeu
-
 -   **`steamspy.csv`** : fournit des données issues de SteamSpy, incluant :
     -   `app_id` (*discrètes*) : identifiant unique du jeu sur Steam
     -   `developer` (*nominales*) : studio de développement
@@ -41,77 +33,73 @@ Description des fichiers et de leur contenu :
     -   `playtime_median` (*discrètes*) : durée médiane de jeu par utilisateur
     -   `concurrent_users_yesterday` (*discrètes*) : nombre total de joueurs connectés (octobre 2024)
     -   `genres` (*nominales*) : catégorie du jeu
-
 -   **`tags.csv`** : répertorie les tags attribués à chaque jeu (différents des genres).
     -   `app_id` (*discrètes*) : identifiant unique du jeu sur Steam
     -   `tag` (*nominales*) : tag associé au jeu
-    
 -   **`reviews.csv`** : contient des informations sur les avis des joueurs :
     -   `app_id` (*discrètes*) : identifiant unique du jeu sur Steam
     -   `review_score_description` (*oridnales*) : évaluation globale (Overwhelmingly Positive, Very Positive, Mixed, etc.)
     -   `positive` / `negative` (*nominales*) : nombre d’avis positifs et négatifs
     -   `metacritic_score` (*discrètes*) : note Metacritic
     -   `recommendations` (*discrètes*) : nombre de recommandations sur Steam
-
 -   **`categories.csv`** : liste les catégories officielles Steam associées aux jeux.
     -   `app_id` (*discrètes*) : identifiant unique du jeu sur Steam
     -   `category` (*nominales*) : catégorie associée au jeu
 
 # Plan d'analyse
 
-Nous tenons à éviter de reproduire les mêmes analyses et visualisations que NewbieIndieGameDev disponible sur ce lien :  [Vidéo sur l'analyse des données par NewbieIndieGameDev](https://www.youtube.com/watch?v=qiNv3qv-YbU)
+Nous tenons à éviter de reproduire les mêmes analyses et visualisations que NewbieIndieGameDev disponible sur ce lien : [Vidéo sur l'analyse des données par NewbieIndieGameDev](https://www.youtube.com/watch?v=qiNv3qv-YbU)
 
 Avec ces nombreuses données et variables, de nombreuses pistes d'analyse sont possibles :
 
 ### Notes et avis des joueurs
-- Une corrélation est-elle identifiable entre les avis/note (Métacritics ou joueurs) et le temps de jeu ?
-- Les avis Metacritic sont-elles corrélées avec les avis données par les joueurs sur la plateforme ?
-- Voir l'évolution des évaluations des joueurs des jeux AAA
+
+-   Une corrélation est-elle identifiable entre les avis/note (Métacritics ou joueurs) et le temps de jeu ?
+-   Les avis Metacritic sont-elles corrélées avec les avis données par les joueurs sur la plateforme ?
+-   Voir l'évolution des évaluations des joueurs des jeux AAA
 
 ### Genres des jeux
 
-- Quels sont les catégories les plus populaires sur Steam actuellement ?
-- Quel est la tendance des jeux sortis récemment ? (genre, jeux indépendants ou AAA, etc...)
-- Observer l'évolution des genres de jeu sortis pour déceler des "modes" et période où certains genre de jeux était les plus populaires ?
-- À partir des résultats de l'observation précédente, essayer de comprendre une montée ou baisse des genres.
-  - Exemple (simple) : est-ce que la croissance du genre battle royale peut-être corrélée/causée avec la sortie du jeu Fortnite
-  - Exemple (complexe) : Peut-on observer une corrélation entre la sortie de jeux en ligne et le déploiement d'internet dans le monde (nécessite de trouver des données sur le déploiement d'internet)
-  
+-   Quels sont les catégories les plus populaires sur Steam actuellement ?
+-   Quel est la tendance des jeux sortis récemment ? (genre, jeux indépendants ou AAA, etc...)
+-   Observer l'évolution des genres de jeu sortis pour déceler des "modes" et période où certains genre de jeux était les plus populaires ?
+-   À partir des résultats de l'observation précédente, essayer de comprendre une montée ou baisse des genres.
+    -   Exemple (simple) : est-ce que la croissance du genre battle royale peut-être corrélée/causée avec la sortie du jeu Fortnite
+    -   Exemple (complexe) : Peut-on observer une corrélation entre la sortie de jeux en ligne et le déploiement d'internet dans le monde (nécessite de trouver des données sur le déploiement d'internet)
+
 ### Jeux indépendants vs AAA
 
-- Les jeux indépendants obtiennent-ils des meilleures évaluations que les AAA ?
-- Quelle est la durée de vie d'un jeu indépendant comparée à un AAA? (on essayera de prendre des jeux avec des genres assez similaires)
-- Les genres/tags des jeux indépendants sont-ils plus "innovants" que les AAA ? 
+-   Les jeux indépendants obtiennent-ils des meilleures évaluations que les AAA ?
+-   Quelle est la durée de vie d'un jeu indépendant comparée à un AAA? (on essayera de prendre des jeux avec des genres assez similaires)
+-   Les genres/tags des jeux indépendants sont-ils plus "innovants" que les AAA ?
 
 ### Prix
 
-- Quels sont les facteurs qui impactent globalement le prix ? (les genres/tags de jeux les plus chers, plus de langues disponibles <=> prix plus chers ?)
-- Comparer des jeux avec des avis/notes similaires mais des prix différents pour voir si le temps de jeu moyen est impacté (est-ce que le prix peut influer le joueur à plus jouer pour le "rentabiliser")
-- Comparer les moyennes des prix des jeux par développeurs / studio de développement, pour potentiellement identifier des stratégies économiques chez certains.
+-   Quels sont les facteurs qui impactent globalement le prix ? (les genres/tags de jeux les plus chers, plus de langues disponibles \<=\> prix plus chers ?)
+-   Comparer des jeux avec des avis/notes similaires mais des prix différents pour voir si le temps de jeu moyen est impacté (est-ce que le prix peut influer le joueur à plus jouer pour le "rentabiliser")
+-   Comparer les moyennes des prix des jeux par développeurs / studio de développement, pour potentiellement identifier des stratégies économiques chez certains.
 
 ### Jeux en ligne
 
-- Quels sont les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
-- Déceler certains jeux avec un fort nombre de joueurs connectés et essayer de l'associer à un évènement à ce moment (octobre 2024) qui explique ce nombre élevé : mise à jour conséquente, évènement d'influenceur relançant l'intérêt pour le jeu, etc...
+-   Quels sont les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
+-   Déceler certains jeux avec un fort nombre de joueurs connectés et essayer de l'associer à un évènement à ce moment (octobre 2024) qui explique ce nombre élevé : mise à jour conséquente, évènement d'influenceur relançant l'intérêt pour le jeu, etc...
 
 ### Différences culturelles/géographique et leurs impacts
 
-- Etudier les langues disponibles selon les jeux des développeurs afin de potentiellement déceler des marchés/régions priorisés.
+-   Etudier les langues disponibles selon les jeux des développeurs afin de potentiellement déceler des marchés/régions priorisés.
 
 ## Variables à comparer/Visualisations à réaliser
 
-Voici une liste non exhaustive des variables comparées ainsi que les visualisations que l'on va réaliser :
-- Nombre de jeux par genre/catégorie, avec possibilité de filtrer par date de sortie pour analyser les tendances récentes.
-- Comparaison entre les scores Metacritic et les avis des utilisateurs sur Steam.
-- Corrélation entre le nombre de langues disponibles et le nombre de propriétaires d’un jeu.
-- Comparaison entre les jeux issus d’un studio indépendant et ceux d’un grand studio, en comparant l’évolution des ventes réalisées, le prix des jeux et les avis des joueurs (ex : les jeux du studio Supergiant Games vs Ubisoft).
-- Analyse des combinaisons de genres les plus fréquentes pour les jeux indépendants et les jeux AAA, afin de mettre en évidence des différences de positionnement.
-- Évolution des prix de lancement des jeux au fil du temps.
+Voici une liste non exhaustive des variables comparées ainsi que les visualisations que l'on va réaliser : - Nombre de jeux par genre/catégorie, avec possibilité de filtrer par date de sortie pour analyser les tendances récentes. - Comparaison entre les scores Metacritic et les avis des utilisateurs sur Steam. - Corrélation entre le nombre de langues disponibles et le nombre de propriétaires d’un jeu. - Comparaison entre les jeux issus d’un studio indépendant et ceux d’un grand studio, en comparant l’évolution des ventes réalisées, le prix des jeux et les avis des joueurs (ex : les jeux du studio Supergiant Games vs Ubisoft). - Analyse des combinaisons de genres les plus fréquentes pour les jeux indépendants et les jeux AAA, afin de mettre en évidence des différences de positionnement. - Évolution des prix de lancement des jeux au fil du temps.
 
 ## Problèmes et limitations
 
-- Le dataset que l'on a choisi est un "snapshot" du SteamLibrary datant d'octobre 2024. On ne pourra pas réaliser de comparaisons dans le temps à part dans certains rares cas où les variables nous le permettent (prix initial d'un jeu, etc...)
-- Pour certaines données notamment provenant de SteamSpy, ce sont des estimations donc les analyses sur ces données perdront une certaine précision
+-   Le dataset que l'on a choisi est un "snapshot" du SteamLibrary datant d'octobre 2024. On ne pourra pas réaliser de comparaisons dans le temps à part dans certains rares cas où les variables nous le permettent (prix initial d'un jeu, etc...)
+-   Pour certaines données notamment provenant de SteamSpy, ce sont des estimations donc les analyses sur ces données perdront une certaine précision
+
+
+## ------------------------------------------------------------------------
+
 
 # Exploration des données
 
@@ -170,11 +158,29 @@ steamspy <- read_csv("data/steamspy.csv")
 
 ```
 
-### Partie Analyse Prix
+### ------------------------------------------------------------------------
+
+### Partie Analyse Prix (Florian LOPITAUX)
+
+Dans cette section, nous allons nous intéresser aux facteurs qui peuvent avoir une influence sur le prix des jeux. Nous avons à partir des données de notre jeu de données relevé différents aspects qui seraient intéressants d'analyser afin de mieux comprendre comment est défini le prix d'un jeu.
+
+Chaque aspect sera approfondi dans sa partie : contexte (pourquoi on se pose la question), traitement des données, analyse (graphique) et conclusion.
+
+Voici les aspects que nous analyserons :
+
+-   le nombre de langues disponibles sur un jeu : est-ce que le coût de traduction impacte le prix du jeu ?
+
+-   les genres/tags des jeux : est-ce qu'on peut observer une différence en moyenne significative entre certains genres/tag de jeu ? Par exemple : Un jeu RPG open-world en 3D serait plus complexe et cher à déveloper qu'un plateformer 2D et donc plus cher ?
+
+-   l'évolution des prix au fil du temps ? Est-ce qu'on peut observer une hausse des prix des jeux en fonction de leur date de sortie ?
+
+-   Y a t-il des différences de prix notables entre les studios de développement ? Ce dernier aspect sera à mettre en relation avec l'aspect étudié précédent sur les genres/tags de jeu que développent les studios.
+
+**Préambule** : Comme nous sommes actuellement pour le premier rendu, seul le premier aspect (les langues) de cette section sur les prix sera traité dans ce rendu. D'autres parts, de nouveaux aspects pourraient être ajoutés d'ici le rendu final si nous en trouvons durant notre analyse.
 
 ### Filtrage des données
 
-Avant de passer à l'analyse, nous devons d'abord filtrer nos données, notamment celles où nous n'avons pas d'informations sur le prix. Ce manque d'information s'explique soit car le jeu est gratuit (free-to-play <=> F2P), soit par une erreur dans les données.
+Avant de passer à l'analyse, nous devons d'abord filtrer nos données, notamment celles où nous n'avons pas d'informations sur le prix. Ce manque d'information s'explique soit car le jeu est gratuit (free-to-play \<=\> F2P), soit par une erreur dans les données.
 
 Nous décidons de ne pas prendre en compte les jeux gratuits dans nos analyses du prix et de les analyser distinctement dans une autre section.
 
@@ -218,204 +224,6 @@ print(paste0("Nombre de lignes sans les jeux avec aucune information sur les lan
 ```
 
 On observe que cette étape supprime peu de lignes, on en déduit donc que les lignes où il y avait une erreur dans les prix sont probablement en majorité les mêmes lignes où il y a eu une erreur avec les langues et qu'il n'y a pas d'information.
-
-## Types des jeux en lignes sur Steam
-
-### Différences entre "Catégorie" et "Tag"
-
-Sur Steam, il existe deux types de variables qui permettent de classer les jeux présents sur la plateforme :
-
-- Catégories : classifications officielles attribuées par Steam. Elles décrivent les fonctionnalités principales d'un jeu (par exemple : Multijoueur, Succès Steam, Support manette, Mode coopératif, etc.). Ce sont des critères souvent liés à l'expérience utilisateur et aux fonctionnalités techniques du jeu.
-
-- Tags : classifications collaboratives créées par les utilisateurs de Steam. Ils permettent de décrire le contenu, l'ambiance ou le style d'un jeu (par exemple : Puzzle, Narratif, Indépendant, FPS, Monde ouvert, etc.). Les tags sont plus subjectifs et peuvent varier en popularité selon la communauté.
-
-![Tags et Catégories de Portal 2 sur Steam](img/portal_tag_categories.png)
-
-### Contexte et problématique
-
-C'est sur la plateforme Steam que l'on a vu naître les premiers jeux en ligne et le développement de celui-ci avec des jeux mythiques comme Counter Strike, Team Forteress, etc...
-D'autres types de jeux sont aussi devenus populaires au cours du temps comme les MMORPG, les Battle-Royale, etc...
-Nous voulons voir les tendances actuelles et quels types de jeux attirent principalement les joueurs de Steam.
-
-Notre problématique est alors la suivante :
-
-Quels sont les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
-
-### Définition de jeu en ligne
-
-Une définition de jeu en ligne sera un jeu vidéo dont l'expérience se repose sur l'intéraction entre plusieurs joueurs en temps réel.
-On distingue différents types de jeu en ligne :
-
-- MMO (Massive Multiplayer Online)
-- Jeux coméptitifs (FPS, MOBA, Battle Royale)
-- Jeux collaboratifs (Eurotruck 2)
-
-### Critères "jeu en ligne" :
-
-Dans nos données, nous identifierons un jeu comme "jeu en ligne" s'il possède les catégories ou tags suivants :
-
-- "Multi-player", "Massively Multiplayer", "Online Co-op", ou d'autres tags associés.
-
-### Critère "popularité" :
-
-Le critère "popularité" sera basée sur le nombre de joueurs actifs en Octobre 2024.
-
-### Types de jeux en ligne
-
-Pour analyser les type de jeux les plus populaires pour les jeux en ligne et regarder sa distribution dans le magasin Steam, on va considérer les tags suivants uniquement :
-
-- FPS Multijoueur
-- Battle Royale
-- RPG en ligne
-- Coopération en ligne
-- Sandbox
-- Survival Multiplayer
-- Autres (correspondant aux autres tags non classés)
-
-```{r get_infos_online_games, include=FALSE}
-# Détecter les jeux multijoueurs
-jeux_en_ligne <- steamData %>%
-  filter(
-    (
-      str_detect(str_to_lower(categories), "multiplayer|massively multiplayer|online co-op") |
-      str_detect(str_to_lower(tags), "multiplayer|mmo|online co-op|pvp|battle royale")
-    )
-  )
-
-# Classer les jeux en type général selon leur tags
-jeux_en_ligne_type <- jeux_en_ligne %>%
-  mutate(
-    type_de_jeu = case_when(
-      str_detect(str_to_lower(tags), "battle royale") ~ "Battle Royale",
-      str_detect(str_to_lower(tags), "moba") ~ "MOBA",
-      str_detect(str_to_lower(tags), "mmorpg|rpg") ~ "RPG en ligne",
-      str_detect(str_to_lower(tags), "survival") ~ "Survival Multijoueur",
-      str_detect(str_to_lower(tags), "fps") & str_detect(str_to_lower(tags), "shooter") ~ "FPS Multijoueur",
-      TRUE ~ "Autres"
-    )
-  )
-
-# Grouper par type de jeu et compter les joueurs + le nombre de jeux
-popularite_types <- jeux_en_ligne_type %>%
-  group_by(type_de_jeu) %>%
-  summarise(
-    total_joueurs_actifs = sum(concurrent_users_yesterday, na.rm = TRUE),
-    nombre_de_jeux = n(),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(total_joueurs_actifs))
-
-```
-
-
-### Analyse des résultats
-
-Voici la répartition des joueurs sur la plateforme Steam sur les jeux en lignes :
-
-```{r barchart,  echo=FALSE, fig.align='center'}
-ggplot(popularite_types, aes(x = reorder(type_de_jeu, total_joueurs_actifs), y = total_joueurs_actifs, fill = type_de_jeu)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  theme_minimal() +
-    scale_fill_brewer(palette = "Set2") +
-  geom_text(aes(label = format(total_joueurs_actifs, big.mark = " ")),
-            position = position_stack(vjust = 0.5),
-            hjust = 0.5) +
-  labs(title = "Total des joueurs actifs par type de jeu",
-       x = element_blank(),
-       y = "Nombre de joueurs actifs (Octobre 2024)")
-```
-
-### Observations
-
-On voit que le genre de jeu en ligne le plus populaire sur Steam est le FPS Multijoueur rassemblant plus d'un tiers des joueurs des jeux en ligne sur Steam représentant 1,5 millions de joueurs avec CS 2 qui représente plus de 1,1 millions de joueurs. 
-
-Ensuite, dans la catégorie "Autres", On y compte 1,3 millions joueurs sur des jeux comme Liar's Bar, War Thunder, Civizilation VI, Forza Horizon et Eurotruck Simulator 2. C'est une catégorie regroupant pleins de genres différents.
-
-Ensuite, les Battle Royale rassemble 1 million de joueurs (environ 16,5% des joueurs). Le genre semble être resté populaire mais elle n'a plus la même popularité qu'entre 2018-2020.
-
-Les RPG en ligne représentent 1.2 million de joueurs mais il faut distinguer les différents genre de RPG en ligne.
-
-En effet, dans les RPG en ligne, ils se trouvent les MMO comme Monster Hunter: World, New World: Aeternum ou Destiny 2 mais également des RPG qui peut se jouer en coopération comme Stardew Valley, Baldur's Gate 3, etc...
-
-Voici la répartition des joueurs jouant à des MMORPG et des joueurs de RPG classique : 
-
-```{r mmo_vs_classicRPG, echo=FALSE, fig.align='center'}
-# Filtrer les jeux RPG en ligne et ajouter une colonne is_MMO
-mmo_vs_classicRPG <- jeux_en_ligne_type %>%
-  filter(type_de_jeu == "RPG en ligne") %>%
-  mutate(is_MMO = case_when(
-    str_detect(str_to_lower(tags), "mmorpg") ~ TRUE,  # Si le tag "mmorpg" est présent
-    TRUE ~ FALSE
-  ))
-
-# Calculer le total de jeux RPG en ligne
-total_jeux_rpg <- nrow(mmo_vs_classicRPG)
-
-# Regrouper les données pour calculer les proportions globales
-proportions_globales <- mmo_vs_classicRPG %>%
-  group_by(is_MMO) %>%
-  summarise(proportion = n()/total_jeux_rpg)
-
-# Créer le graphique avec les pourcentages sur les barres
-ggplot(proportions_globales, aes(x = "", y = proportion, fill = is_MMO)) +
-  geom_bar(stat = "identity", width = 0.8) +
-  scale_fill_manual(
-    values = c("FALSE" = "#4DAF4A", "TRUE" = "#FF7F00"),
-    name = "Type de jeu", 
-    labels = c("RPG en ligne (non MMO)", "MMORPG")  
-  ) +
-  geom_text(
-    aes(label = scales::percent(proportion, accuracy = 0.1)), 
-    position = position_stack(vjust = 0.5)
-  ) +
-  labs(
-    title = "Proportion des joueurs joaunt aux MMORPG aux RPG en ligne (non MMO)",
-    x = "", 
-    y = "Proportion (%)"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_blank(),
-    axis.title.x = element_blank()
-  )
-```
-
-Note : Stardew Valley a le tag RPG et est un jeu qui peut se jouer en multijoueur mais peut-on considérer comme un jeu en ligne ? C'est le cas d'autres jeux principalement singleplayer mais qui peut se jouer en multijoueur.
-
-Les Survival Multijoueur représentent une base de 800 000 joueurs sur des jeux phares comme Rust, Factorio, Satisfactory, etc...
-
-Enfin, les MOBA représentent uniquement moins de 550 000 joueurs dont la majorité des joueurs viennent de Dota 2 (500 000 joueurs).
-
-### Limites de résultats obtenus
-
-- Les tags Steam et les catégories créées ne sont pas assez précises pour trouver les jeux en ligne car on se retrouve souvent à la frontière d'un jeu avec un système multijoueur et un jeu en ligne.
-
-- D'autres visualisations au sein des catégories nous permettraient de voir qu'uniquement quelques jeux portent la base de jeu de certains types de jeux comme CS 2 pour les FPS et Dota 2 pour les MOBA.
-
-- Le fait que la catégorie "Autres" possèdent de nombreux jeux en ligne que l'on a pas pu classer montre que le domaine des jeux en ligne est très variée et non cantonnée aux genres que l'on pense habituellement. Globalement, réaliser une classification sur l'ensemble des jeux Steam semble difficile tant certains jeux sont assez particulier pour les catégoriser.
-
-- Enfin, il faut être conscient que ces données ne concernent que les utilisateurs Steam et non la globalité des joueurs. Par exemple, pour les MMORPG, ceux-ci peuvent être lancés hors Steam. De plus avec l'avènement de l'Epic Game Store, une partie des jeux sont passés sur l'autre plateforme comme Rocket League.
-
-## Analyse du prix des jeux
-
-Dans cette section, nous allons nous intéresser aux facteurs qui peuvent avoir une influence sur le prix des jeux. Nous avons à partir des données de notre jeu de données relevé différents aspects qui seraient intéressants d'analyser afin de mieux comprendre comment est défini le prix d'un jeu.
-
-Chaque aspect sera approfondi dans sa partie : contexte (pourquoi on se pose la question), traitement des données, analyse (graphique) et conclusion.
-
-Voici les aspects que nous analyserons :
-
--   le nombre de langues disponibles sur un jeu : est-ce que le coût de traduction impacte le prix du jeu ?
-
--   les genres/tags des jeux : est-ce qu'on peut observer une différence en moyenne significative entre certains genres/tag de jeu ? Par exemple : Un jeu RPG open-world en 3D serait plus complexe et cher à déveloper qu'un plateformer 2D et donc plus cher ?
-
--   l'évolution des prix au fil du temps ? Est-ce qu'on peut observer une hausse des prix des jeux en fonction de leur date de sortie ?
-
--   Y a t-il des différences de prix notables entre les studios de développement ? Ce dernier aspect sera à mettre en relation avec l'aspect étudié précédent sur les genres/tags de jeu que développent les studios.
-
-**Préambule** : Comme nous sommes actuellement pour le premier rendu, seul le premier aspect (les langues) de cette section sur les prix sera traité dans ce rendu. D'autres parts, de nouveaux aspects pourraient être ajoutés d'ici le rendu final si nous en trouvons durant notre analyse.
-
-### ------------------------------------------------------------------------
 
 ### L'impact des langues disponibles
 
@@ -468,7 +276,189 @@ Comme nous pouvons l'observer, de nombreux jeux possédant le même nombre de la
 
 Notre hypothèse concernant les moyens et coûts de traduction qui pourraient impacter le prix est donc fausse. Cela nous parraît cohérent étant donné qu'aujourd'hui le support multi-language est devenu une norme pour une grande partie des jeux. Les studios aujourd'hui visent un marché international et donc doivent rendre leurs jeux accessibles pour ces marchés.
 
-## Analyse des notes des jeux AAA et indies
+
+### ------------------------------------------------------------------------
+
+
+## Types des jeux en lignes sur Steam (Hoang-Viêt LE)
+
+### Différences entre "Catégorie" et "Tag"
+
+Sur Steam, il existe deux types de variables qui permettent de classer les jeux présents sur la plateforme :
+
+-   Catégories : classifications officielles attribuées par Steam. Elles décrivent les fonctionnalités principales d'un jeu (par exemple : Multijoueur, Succès Steam, Support manette, Mode coopératif, etc.). Ce sont des critères souvent liés à l'expérience utilisateur et aux fonctionnalités techniques du jeu.
+
+-   Tags : classifications collaboratives créées par les utilisateurs de Steam. Ils permettent de décrire le contenu, l'ambiance ou le style d'un jeu (par exemple : Puzzle, Narratif, Indépendant, FPS, Monde ouvert, etc.). Les tags sont plus subjectifs et peuvent varier en popularité selon la communauté.
+
+![Tags et Catégories de Portal 2 sur Steam](img/portal_tag_categories.png)
+
+### Contexte et problématique
+
+C'est sur la plateforme Steam que l'on a vu naître les premiers jeux en ligne et le développement de celui-ci avec des jeux mythiques comme Counter Strike, Team Forteress, etc... D'autres types de jeux sont aussi devenus populaires au cours du temps comme les MMORPG, les Battle-Royale, etc... Nous voulons voir les tendances actuelles et quels types de jeux attirent principalement les joueurs de Steam.
+
+Notre problématique est alors la suivante :
+
+Quels sont les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
+
+### Définition de jeu en ligne
+
+Une définition de jeu en ligne sera un jeu vidéo dont l'expérience se repose sur l'intéraction entre plusieurs joueurs en temps réel. On distingue différents types de jeu en ligne :
+
+-   MMO (Massive Multiplayer Online)
+-   Jeux coméptitifs (FPS, MOBA, Battle Royale)
+-   Jeux collaboratifs (Eurotruck 2)
+
+### Critères "jeu en ligne" :
+
+Dans nos données, nous identifierons un jeu comme "jeu en ligne" s'il possède les catégories ou tags suivants :
+
+-   "Multi-player", "Massively Multiplayer", "Online Co-op", ou d'autres tags associés.
+
+### Critère "popularité" :
+
+Le critère "popularité" sera basée sur le nombre de joueurs actifs en Octobre 2024.
+
+### Types de jeux en ligne
+
+Pour analyser les type de jeux les plus populaires pour les jeux en ligne et regarder sa distribution dans le magasin Steam, on va considérer les tags suivants uniquement :
+
+-   FPS Multijoueur
+-   Battle Royale
+-   RPG en ligne
+-   Coopération en ligne
+-   Sandbox
+-   Survival Multiplayer
+-   Autres (correspondant aux autres tags non classés)
+
+```{r get_infos_online_games, include=FALSE}
+# Détecter les jeux multijoueurs
+jeux_en_ligne <- steamData %>%
+  filter(
+    (
+      str_detect(str_to_lower(categories), "multiplayer|massively multiplayer|online co-op") |
+      str_detect(str_to_lower(tags), "multiplayer|mmo|online co-op|pvp|battle royale")
+    )
+  )
+
+# Classer les jeux en type général selon leur tags
+jeux_en_ligne_type <- jeux_en_ligne %>%
+  mutate(
+    type_de_jeu = case_when(
+      str_detect(str_to_lower(tags), "battle royale") ~ "Battle Royale",
+      str_detect(str_to_lower(tags), "moba") ~ "MOBA",
+      str_detect(str_to_lower(tags), "mmorpg|rpg") ~ "RPG en ligne",
+      str_detect(str_to_lower(tags), "survival") ~ "Survival Multijoueur",
+      str_detect(str_to_lower(tags), "fps") & str_detect(str_to_lower(tags), "shooter") ~ "FPS Multijoueur",
+      TRUE ~ "Autres"
+    )
+  )
+
+# Grouper par type de jeu et compter les joueurs + le nombre de jeux
+popularite_types <- jeux_en_ligne_type %>%
+  group_by(type_de_jeu) %>%
+  summarise(
+    total_joueurs_actifs = sum(concurrent_users_yesterday, na.rm = TRUE),
+    nombre_de_jeux = n(),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(total_joueurs_actifs))
+
+```
+
+### Analyse des résultats
+
+Voici la répartition des joueurs sur la plateforme Steam sur les jeux en lignes :
+
+```{r barchart,  echo=FALSE, fig.align='center'}
+ggplot(popularite_types, aes(x = reorder(type_de_jeu, total_joueurs_actifs), y = total_joueurs_actifs, fill = type_de_jeu)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  theme_minimal() +
+    scale_fill_brewer(palette = "Set2") +
+  geom_text(aes(label = format(total_joueurs_actifs, big.mark = " ")),
+            position = position_stack(vjust = 0.5),
+            hjust = 0.5) +
+  labs(title = "Total des joueurs actifs par type de jeu",
+       x = element_blank(),
+       y = "Nombre de joueurs actifs (Octobre 2024)")
+```
+
+### Observations
+
+On voit que le genre de jeu en ligne le plus populaire sur Steam est le FPS Multijoueur rassemblant plus d'un tiers des joueurs des jeux en ligne sur Steam représentant 1,5 millions de joueurs avec CS 2 qui représente plus de 1,1 millions de joueurs.
+
+Ensuite, dans la catégorie "Autres", On y compte 1,3 millions joueurs sur des jeux comme Liar's Bar, War Thunder, Civizilation VI, Forza Horizon et Eurotruck Simulator 2. C'est une catégorie regroupant pleins de genres différents.
+
+Ensuite, les Battle Royale rassemble 1 million de joueurs (environ 16,5% des joueurs). Le genre semble être resté populaire mais elle n'a plus la même popularité qu'entre 2018-2020.
+
+Les RPG en ligne représentent 1.2 million de joueurs mais il faut distinguer les différents genre de RPG en ligne.
+
+En effet, dans les RPG en ligne, ils se trouvent les MMO comme Monster Hunter: World, New World: Aeternum ou Destiny 2 mais également des RPG qui peut se jouer en coopération comme Stardew Valley, Baldur's Gate 3, etc...
+
+Voici la répartition des joueurs jouant à des MMORPG et des joueurs de RPG classique :
+
+```{r mmo_vs_classicRPG, echo=FALSE, fig.align='center'}
+# Filtrer les jeux RPG en ligne et ajouter une colonne is_MMO
+mmo_vs_classicRPG <- jeux_en_ligne_type %>%
+  filter(type_de_jeu == "RPG en ligne") %>%
+  mutate(is_MMO = case_when(
+    str_detect(str_to_lower(tags), "mmorpg") ~ TRUE,  # Si le tag "mmorpg" est présent
+    TRUE ~ FALSE
+  ))
+
+# Calculer le total de jeux RPG en ligne
+total_jeux_rpg <- nrow(mmo_vs_classicRPG)
+
+# Regrouper les données pour calculer les proportions globales
+proportions_globales <- mmo_vs_classicRPG %>%
+  group_by(is_MMO) %>%
+  summarise(proportion = n()/total_jeux_rpg)
+
+# Créer le graphique avec les pourcentages sur les barres
+ggplot(proportions_globales, aes(x = "", y = proportion, fill = is_MMO)) +
+  geom_bar(stat = "identity", width = 0.8) +
+  scale_fill_manual(
+    values = c("FALSE" = "#4DAF4A", "TRUE" = "#FF7F00"),
+    name = "Type de jeu", 
+    labels = c("RPG en ligne (non MMO)", "MMORPG")  
+  ) +
+  geom_text(
+    aes(label = scales::percent(proportion, accuracy = 0.1)), 
+    position = position_stack(vjust = 0.5)
+  ) +
+  labs(
+    title = "Proportion des joueurs joaunt aux MMORPG aux RPG en ligne (non MMO)",
+    x = "", 
+    y = "Proportion (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.title.x = element_blank()
+  )
+```
+
+Note : Stardew Valley a le tag RPG et est un jeu qui peut se jouer en multijoueur mais peut-on considérer comme un jeu en ligne ? C'est le cas d'autres jeux principalement singleplayer mais qui peut se jouer en multijoueur.
+
+Les Survival Multijoueur représentent une base de 800 000 joueurs sur des jeux phares comme Rust, Factorio, Satisfactory, etc...
+
+Enfin, les MOBA représentent uniquement moins de 550 000 joueurs dont la majorité des joueurs viennent de Dota 2 (500 000 joueurs).
+
+### Limites de résultats obtenus
+
+-   Les tags Steam et les catégories créées ne sont pas assez précises pour trouver les jeux en ligne car on se retrouve souvent à la frontière d'un jeu avec un système multijoueur et un jeu en ligne.
+
+-   D'autres visualisations au sein des catégories nous permettraient de voir qu'uniquement quelques jeux portent la base de jeu de certains types de jeux comme CS 2 pour les FPS et Dota 2 pour les MOBA.
+
+-   Le fait que la catégorie "Autres" possèdent de nombreux jeux en ligne que l'on a pas pu classer montre que le domaine des jeux en ligne est très variée et non cantonnée aux genres que l'on pense habituellement. Globalement, réaliser une classification sur l'ensemble des jeux Steam semble difficile tant certains jeux sont assez particulier pour les catégoriser.
+
+-   Enfin, il faut être conscient que ces données ne concernent que les utilisateurs Steam et non la globalité des joueurs. Par exemple, pour les MMORPG, ceux-ci peuvent être lancés hors Steam. De plus avec l'avènement de l'Epic Game Store, une partie des jeux sont passés sur l'autre plateforme comme Rocket League.
+
+
+### ------------------------------------------------------------------------
+
+
+## Analyse des notes des jeux AAA et indies (Paul Lassasseigne)
 
 ### Introduction
 
@@ -490,7 +480,7 @@ Face à ce contexte qui oppose budget et innovation, une question se soulève qu
 
 ### Chargement et préparation des données
 
-Afin de réaliser l'analyse, on va utiliser les fichiers [raw_reviews.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/raw_reviews.csv) et [tags.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/tags.csv) qui seront suffisants. Les deux fichiers sont reliés par app_id, tags.csv va nous permettre de séparer les jeux par le groupe des jeux indépendants et celui des jeux AAA, et raw_reviews.csv va nous permettre d'obtenir les notes attribuées pour chaque jeu. 
+Afin de réaliser l'analyse, on va utiliser les fichiers [raw_reviews.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/raw_reviews.csv) et [tags.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/tags.csv) qui seront suffisants. Les deux fichiers sont reliés par app_id, tags.csv va nous permettre de séparer les jeux par le groupe des jeux indépendants et celui des jeux AAA, et raw_reviews.csv va nous permettre d'obtenir les notes attribuées pour chaque jeu.
 
 ### Préparation des jeux
 
@@ -583,12 +573,15 @@ L'analyse du graphique montre que, proportionnellement, les jeux AAA obtiennent 
 
 Cette hypothèse vient du fait que aujourd'hui, les joueurs sont focalisés sur un léger pourcentage de jeux par rapport à l'entièreté du monde du jeu vidéo. Tous les jours de nouveaux jeux sortent, tous les jours il peut y en avoir d'excellents, mais ils ne feront pas le même bruit que les jeux colossaux développés par les grandes entreprises, comme Microsoft, Ubisoft, Activision Blizzard, Rockstar etc...
 
-## Tendance des jeux sortis récemments
+
+### ------------------------------------------------------------------------
+
+
+## Tendance des jeux sortis récemments (Jules PERRIN)
 
 ### Précision et définition
-Ici on cherche à représenter la tendance actuelle. On utilisera donc la population steam présente le jour de la construction du dataset (bien que pas objectivement représentatif cf. interprétation).
-On cherche également à se concentrer sur les jeux récents. On utilisera donc tous les jeux sortis en 2024
 
+Ici on cherche à représenter la tendance actuelle. On utilisera donc la population steam présente le jour de la construction du dataset (bien que pas objectivement représentatif cf. interprétation). On cherche également à se concentrer sur les jeux récents. On utilisera donc tous les jeux sortis en 2024
 
 ```{r}
 games_2024 <- games %>%
@@ -619,7 +612,8 @@ tag_players %>%
   )
 
 ```
-Voila donc un aperçu des tags les plus populaires selon le contexte établi 
+
+Voila donc un aperçu des tags les plus populaires selon le contexte établi
 
 ### Visualisation
 
@@ -638,17 +632,17 @@ ggplot(tag_players,
          theme_minimal()
 ```
 
-### Interpretation 
+### Interpretation
 
 On peut observer des tags assez génériques néanmoins on peut s'interroger sur la présence d'early access. Est ce que cette position dans les tags résulte de la curiosité des joueurs pour les jeux "non sortis" en général. Ou bien est-ce qu'un triple A était très attendu et est sorti en early acces en 2024.
 
-On peut également observer que les jeux multi et single player se valent mais cette interprétation est à nuancer car les jeux peuvent avoir les 2 tags de par la présence d'une campagne ou d'un mode histoire. 
+On peut également observer que les jeux multi et single player se valent mais cette interprétation est à nuancer car les jeux peuvent avoir les 2 tags de par la présence d'une campagne ou d'un mode histoire.
 
-Les jeux en Coop sont significativement au delà des jeux coop online. Cela pourrait se traduire par l'envie des joueurs de jouer uniquement avec leurs amis ou au moins de ne pas jouer avec des gens aléatoire qui pourraientt avoir un écart de niveau important ou juste vouloir "troller". au demeurant, les jeux coop n'ont pas forcement de mode en ligne                                                      
+Les jeux en Coop sont significativement au delà des jeux coop online. Cela pourrait se traduire par l'envie des joueurs de jouer uniquement avec leurs amis ou au moins de ne pas jouer avec des gens aléatoire qui pourraientt avoir un écart de niveau important ou juste vouloir "troller". au demeurant, les jeux coop n'ont pas forcement de mode en ligne
 
+### Limites et attentions
 
-### Limites et attentions 
-Il faut absolument garder en tête que le dataset ne se base pas sur tout l'historique de steam mais bien sur une journée ce qui peut donc ne pas être représentatif à la perfection. 
+Il faut absolument garder en tête que le dataset ne se base pas sur tout l'historique de steam mais bien sur une journée ce qui peut donc ne pas être représentatif à la perfection.
 
 Les résultat présents sont limités par le fait que beaucoup de jeux peuvent avoir plusieurs tags et donc compter plusieurs fois et biaiser les résultat. Ici impossible de faire la distcntion car il n'y a pas de hiérarchisation des tags. Néamoins une possibilité pourrait être de donner un poids aà certains tags trop générique pour observer des résultat plus axé sur le theme du jeux en lui même (military plutot que multiplayer)
 
