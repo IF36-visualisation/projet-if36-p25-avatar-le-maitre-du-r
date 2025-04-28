@@ -106,11 +106,6 @@ Voici une liste non exhaustive des variables comparées ainsi que les visualisat
 ## Importations des données
 
 ```{r import, message=FALSE, warning=FALSE}
-library(dplyr)
-library(readr)
-library(tidyr)
-library(ggplot2)
-library(stringr)
 library(scales)
 library(lubridate)
 library(tidyverse)
@@ -155,7 +150,6 @@ games <- read_delim("./data/clean_games.csv", delim=";", show_col_types = FALSE)
 # Utilisé par Jules
 
 steamspy <- read_csv("data/steamspy.csv")
-
 ```
 
 ### ------------------------------------------------------------------------
@@ -589,10 +583,6 @@ games_2024 <- games %>%
   filter(year(release_date) == 2024) %>%
   select(app_id)
 
-
-
-
-
 tag_players <- tags %>% 
   semi_join(games_2024, by = "app_id") %>%
   left_join(steamspy %>% 
@@ -610,7 +600,6 @@ tag_players %>%
     caption = "Top 10 des tags pour les jeux de 2024",
     align = c("l", "r")
   )
-
 ```
 
 Voila donc un aperçu des tags les plus populaires selon le contexte établi
@@ -632,7 +621,7 @@ ggplot(tag_players,
          theme_minimal()
 ```
 
-### Interpretation
+### Interprétation
 
 On peut observer des tags assez génériques néanmoins on peut s'interroger sur la présence d'early access. Est ce que cette position dans les tags résulte de la curiosité des joueurs pour les jeux "non sortis" en général. Ou bien est-ce qu'un triple A était très attendu et est sorti en early acces en 2024.
 
