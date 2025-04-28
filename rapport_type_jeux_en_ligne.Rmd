@@ -2,7 +2,9 @@
 title: "Type de jeux en ligne sur Steam"
 author: "Hoang-Viêt LE"
 date: "2025-04-24"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -17,10 +19,10 @@ Dans cette partie, on doit importer les données dans les différents fichiers e
 
 Ce que l'on a à faire :
 
-- Tous les tableaux partagent une colonne commune : app_id, qui sera utilisée pour les jointures. On va alors créé un grand dataframe avec l'ensemble des variables que l'on veut exploiter.
-- Certaines colonnes nécessitent un nettoyage, notamment la colonne initial_price contenant parfois la valeur "\\N"
-- Regrouper les tags et les catégories sur une même ligne (même app_id) des fichiers tags.csv et categories.csv : les colonnes tags et categories seront des chaînes de caractères contenant l'ensemble des tags/catégories séparés chacun par une virgule
-- Convertir l'initial_price en une donnée exploitable dans steamspy.csv (ex : 999 veut dire 9.99 USD)
+- Tous les tableaux partagent une colonne commune : `app_id`, qui sera utilisée pour les jointures. On va alors créé un grand dataframe avec l'ensemble des variables que l'on veut exploiter.
+- Certaines colonnes nécessitent un nettoyage, notamment la colonne `initial_price` contenant parfois la valeur "\\N"
+- Regrouper les tags et les catégories sur une même ligne (même `app_id`) des fichiers `tags.csv` et `categories.csv` : les colonnes `tags` et `categories` seront des chaînes de caractères contenant l'ensemble des tags/catégories séparés chacun par une virgule
+- Convertir `initial_price` en une donnée exploitable dans `steamspy.csv` (ex : 999 veut dire 9.99 USD)
 
 ```{r init, echo=FALSE, include=FALSE}
 print(getwd())
@@ -81,6 +83,15 @@ Sur Steam, il existe deux types de variables qui permettent de classer les jeux 
 - Tags : classifications collaboratives créées par les utilisateurs de Steam. Ils permettent de décrire le contenu, l'ambiance ou le style d'un jeu (par exemple : Puzzle, Narratif, Indépendant, FPS, Monde ouvert, etc.). Les tags sont plus subjectifs et peuvent varier en popularité selon la communauté.
 
 ![Tags et Catégories de Portal 2 sur Steam](img/portal_tag_categories.png)
+
+
+
+
+
+
+
+
+
 
 # Analyse
 
