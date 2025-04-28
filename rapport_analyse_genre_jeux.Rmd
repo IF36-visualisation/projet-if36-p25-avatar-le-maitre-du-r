@@ -1,0 +1,109 @@
+---
+title: "rapport_analyse_genre"
+author: "Jules PERRIN"
+output: html_document
+date: "2025-04-27"
+---
+
+
+
+# Contexte général
+Steam est une plateforme qui proposent l'un des plus gros catalogue de jeu vidéo du marché. Chaque jeu proposé a plusieurs caractéristique (nom, prix, éditeur , etc). Parmi ces caractéristique, l'une d'entre elle nous intéresse particulierement dans ce rapport. En effet les tags permettent aux joueur de se faire une idée rapide des jeux proposé ou encore de rechercher de nouveaux jeux selon leur préférence.
+
+Le jeux de donnée que nous allons utiliser ne comporte pas de donnée permettant de dresser une temporalité. Ce rapport portera donc sur les données du catalogue steam e octobre 2024.
+
+Les catégories ne doivent pas être confondu avec les tags. Ici les catégories représentent comment l'on joue au jeu (multiplayer, online pvp, remote play on phone etc). Alors que les tags représentent à quoi l'on joue (survival, tactical, FPS, old school, etc). 
+
+# Problématique
+
+Ce rapport traitera une question pour le moment: 
+
+ - Quel est la tendance des jeux sortis récemment ?
+ 
+Cela nous permettera d'avoir une idée global de la dispersion des joueurs dans les catégories majeurs sur steam pour les nouveaux jeux. Pourrais être utile à un studio pour orienter son futur jeux viéo par exmple. 
+ 
+# Analyse
+## Import des données
+
+Premièrement il faut importer les données nécessaire a cette analyse.
+Ainsi que charger les librairies requises pour travailler et visualiser les données
+Les données des fichiers tags, steamspy et games sont nécéssaire
+
+```{r import, message=FALSE, warning=FALSE}
+library(tidyr)
+library(scales)
+library(lubridate)
+library(ggplot2)
+library(tidyverse)
+
+steamspy <- read_csv("data/steamspy.csv")
+tags <- read_csv("data/tags.csv")
+games <- read_delim("data/clean_games.csv", delim=";", show_col_types = FALSE)
+head(games)
+```
+
+## précision et définition
+Ici on cherche a représenter le tendance actuelle. On utilisera donc la population steam présente le jour de la construction du dataset (bien que pas objectivement representatif cf interpretation).
+On cherche également a se concentré sur les jeux récent. On utilisera donc tous les jeux sorite en 2024
+
+
+
+```{r}
+games_2024 <- games %>%
+  mutate(release_date = ymd(release_date)) %>%
+  filter(year(release_date) == 2024) %>%
+  select(app_id)
+
+
+
+
+
+tag_players <- tags %>% 
+  semi_join(games_2024, by = "app_id") %>%
+  left_join(steamspy %>% 
+              select(app_id, concurrent_users_yesterday),
+            by = "app_id") %>%
+  group_by(tag) %>% 
+  summarise(total_ccu = sum(concurrent_users_yesterday, na.rm = TRUE), .groups = "drop") %>%
+  arrange(desc(total_ccu)) %>% 
+  slice_head(n = 10)
+
+print(tag_players)
+
+```
+Voila donc un apercu des tag les plus populaire selon ce le contexte établi 
+
+## visualisation
+
+
+```{r}
+ggplot(tag_players, 
+       aes(x = reorder(tag, total_ccu), 
+           y = total_ccu)) +
+         geom_col(fill = "steelblue") +
+         coord_flip() + 
+         scale_y_continuous(labels = comma) + 
+         geom_text(aes(label = comma(total_ccu)),
+                   hjust = -0.1, size = 3) + 
+         labs(title = "Meilleur tag de l'année", 
+              x = NULL,
+              y = "joueur connecté a la création du dataset") + 
+         theme_minimal()
+```
+
+
+
+
+
+
+## interpretation 
+early acces voir quelle jeux c'est
+multi et single se valle a peu pres 
+co op local met une vitesse a co op online = peur de tomber avec des retardes ? 
+
+
+## limites et attentions 
+cross tag : CS = first person and 
+1 jour = peu représentatif
+limité par les donnees
+
