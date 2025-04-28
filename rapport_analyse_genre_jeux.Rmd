@@ -8,26 +8,26 @@ date: "2025-04-27"
 
 
 # Contexte général
-Steam est une plateforme qui proposent l'un des plus gros catalogue de jeu vidéo du marché. Chaque jeu proposé a plusieurs caractéristique (nom, prix, éditeur , etc). Parmi ces caractéristique, l'une d'entre elle nous intéresse particulierement dans ce rapport. En effet les tags permettent aux joueur de se faire une idée rapide des jeux proposé ou encore de rechercher de nouveaux jeux selon leur préférence.
+Steam est une plateforme qui propose l'un des plus gros catalogue de jeux vidéo du marché. Chaque jeu proposé a plusieurs caractéristiques (nom, prix, éditeur , etc). Parmi ces caractéristiques, l'une d'entre elle nous intéresse particulièrement dans ce rapport. En effet les tags permettent aux joueurs de se faire une idée rapide des jeux proposés ou encore de rechercher de nouveaux jeux selon leur préférences.
 
-Le jeux de donnée que nous allons utiliser ne comporte pas de donnée permettant de dresser une temporalité. Ce rapport portera donc sur les données du catalogue steam e octobre 2024.
+Le jeu de données que nous allons utiliser ne comporte pas de données permettant de dresser une temporalité. Ce rapport portera donc sur les données du catalogue Steam en octobre 2024.
 
-Les catégories ne doivent pas être confondu avec les tags. Ici les catégories représentent comment l'on joue au jeu (multiplayer, online pvp, remote play on phone etc). Alors que les tags représentent à quoi l'on joue (survival, tactical, FPS, old school, etc). 
+Les catégories ne doivent pas être confondues avec les tags. Ici les catégories représentent comment l'on joue au jeu (multiplayer, online pvp, remote play on phone etc). Alors que les tags représentent à quoi l'on joue (survival, tactical, FPS, old school, etc). 
 
 # Problématique
 
 Ce rapport traitera une question pour le moment: 
 
- - Quel est la tendance des jeux sortis récemment ?
+ - Quelle est la tendance des jeux sortis récemment ?
  
-Cela nous permettera d'avoir une idée global de la dispersion des joueurs dans les catégories majeurs sur steam pour les nouveaux jeux. Pourrais être utile à un studio pour orienter son futur jeux viéo par exmple. 
+Cela nous permettra d'avoir une idée globale de la dispersion des joueurs dans les catégories majeurs sur steam pour les nouveaux jeux. Pourrait être utile à un studio pour orienter son futur jeux vidéo par example. 
  
 # Analyse
 ## Import des données
 
-Premièrement il faut importer les données nécessaire a cette analyse.
+Premièrement il faut importer les données nécessaires à cette analyse.
 Ainsi que charger les librairies requises pour travailler et visualiser les données
-Les données des fichiers tags, steamspy et games sont nécéssaire
+Les données des fichiers tags, steamspy et games sont nécéssaires
 
 ```{r import, message=FALSE, warning=FALSE}
 library(tidyr)
@@ -39,12 +39,11 @@ library(tidyverse)
 steamspy <- read_csv("data/steamspy.csv")
 tags <- read_csv("data/tags.csv")
 games <- read_delim("data/clean_games.csv", delim=";", show_col_types = FALSE)
-head(games)
 ```
 
-## précision et définition
-Ici on cherche a représenter le tendance actuelle. On utilisera donc la population steam présente le jour de la construction du dataset (bien que pas objectivement representatif cf interpretation).
-On cherche également a se concentré sur les jeux récent. On utilisera donc tous les jeux sorite en 2024
+## Précision et définition
+Ici on cherche à représenter la tendance actuelle. On utilisera donc la population steam présente le jour de la construction du dataset (bien que pas objectivement représentatif cf. interprétation).
+On cherche également à se concentrer sur les jeux récents. On utilisera donc tous les jeux sortis en 2024
 
 
 
@@ -68,13 +67,18 @@ tag_players <- tags %>%
   arrange(desc(total_ccu)) %>% 
   slice_head(n = 10)
 
-print(tag_players)
+tag_players %>%
+  mutate(total_ccu = formatC(total_ccu, format = "d", big.mark = " ")) %>% 
+  knitr::kable(
+    col.names = c("Tags", "Joueur connectés"), 
+    caption = "Top 10 des tags pour les jeux de 2024",
+    align = c("l", "r")
+  )
 
 ```
-Voila donc un apercu des tag les plus populaire selon ce le contexte établi 
+Voila donc un aperçu des tags les plus populaires selon le contexte établi 
 
-## visualisation
-
+## Visualisation
 
 ```{r}
 ggplot(tag_players, 
@@ -91,19 +95,18 @@ ggplot(tag_players,
          theme_minimal()
 ```
 
+## Interpretation 
+
+On peut observer des tags assez génériques néanmoins on peut s'interroger sur la présence d'early access. Est ce que cette position dans les tags résulte de la curiosité des joueurs pour les jeux "non sortis" en général. Ou bien est-ce qu'un triple A était très attendu et est sorti en early acces en 2024.
+
+On peut également observer que les jeux multi et single player se valent mais cette interprétation est à nuancer car les jeux peuvent avoir les 2 tags de par la présence d'une campagne ou d'un mode histoire. 
+
+Les jeux en Coop sont significativement au delà des jeux coop online. Cela pourrait se traduire par l'envie des joueurs de jouer uniquement avec leurs amis ou au moins de ne pas jouer avec des gens aléatoire qui pourraientt avoir un écart de niveau important ou juste vouloir "troller". au demeurant, les jeux coop n'ont pas forcement de mode en ligne                                                      
 
 
+## Limites et attentions 
+Il faut absolument garder en tête que le dataset ne se base pas sur tout l'historique de steam mais bien sur une journée ce qui peut donc ne pas être représentatif à la perfection. 
 
+Les résultat présents sont limités par le fait que beaucoup de jeux peuvent avoir plusieurs tags et donc compter plusieurs fois et biaiser les résultat. Ici impossible de faire la distcntion car il n'y a pas de hiérarchisation des tags. Néamoins une possibilité pourrait être de donner un poids aà certains tags trop générique pour observer des résultat plus axé sur le theme du jeux en lui même (military plutot que multiplayer)
 
-
-## interpretation 
-early acces voir quelle jeux c'est
-multi et single se valle a peu pres 
-co op local met une vitesse a co op online = peur de tomber avec des retardes ? 
-
-
-## limites et attentions 
-cross tag : CS = first person and 
-1 jour = peu représentatif
-limité par les donnees
-
+Nous sommes également limité par l'explicité des tags, par exemple, Coop online est-il réservé au jeux qui proposent un matchmaking ou aux jeux permettant d'invité ses amis ou les deux. Ces petites imprécision affecte également la pertinence de l'analyse. 
