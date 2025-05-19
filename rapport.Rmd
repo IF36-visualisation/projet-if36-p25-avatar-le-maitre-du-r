@@ -4,6 +4,14 @@ author: "Hoang-Viêt LE, Paul LASSASEIGNE, Florian LOPITAUX et Jules PERRIN"
 date: "2025-04-28"
 output: html_document
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  results = 'hide' 
+)
+```
 
 ### Membres du groupe
 
@@ -105,13 +113,17 @@ Voici une liste non exhaustive des variables comparées ainsi que les visualisat
 
 ## Importations des données
 
-```{r import, message=FALSE, warning=FALSE}
+```{r import}
 library(scales)
 library(lubridate)
 library(tidyverse)
+library(corrr)
+library(knitr)
 
 # Utilisé par Paul
-reviews <- read_csv("data/raw_reviews.csv")
+reviews <- read_csv("data/raw_reviews.csv") %>%
+    filter(grepl("^\\d+$", app_id)) %>%
+    mutate( app_id = as.character(app_id))
 tags <- read_csv("data/tags.csv")
 
 # Utilisé par Viêt 
@@ -133,7 +145,9 @@ clean_games <- read.csv("data/clean_games.csv", sep=";")
 # Créer un dataframe contenant toutes les informations en réalisant des jointures
 steamData <- left_join(clean_games, steamspy, by="app_id") %>% 
   left_join(tags_regroup, by="app_id") %>% 
-  left_join(categories, by="app_id")
+  left_join(categories, by="app_id") %>%
+  mutate(app_id = as.character(app_id)) %>%
+  left_join(reviews, by="app_id")
 
 # Mettre les tags et catégories en lowercase pour les str_detect
 steamData <- steamData %>%
@@ -141,6 +155,40 @@ steamData <- steamData %>%
     # Nettoyer les champs : enlever les espaces superflus, mettre en minuscules pour str_detect
     categories = str_to_lower(str_trim(categories)),
     tags = str_to_lower(str_trim(tags))
+  )
+
+# Trabnsformer toutes les valeurs "\\N" en NA
+steamData <- steamData %>%
+  mutate(across(where(is.character), ~ na_if(., "\\N")))
+
+# Retirer les colonnes en double et renomme les colonnes précédentes
+steamData <- steamData %>%
+  select(-price.y, -languages.y) %>%
+  rename(price = price.x,
+         languages = languages.x)
+
+# Modifier la colonne initial_price pour qu'elle corresponde à sa valeur en USD
+# Checker si le jeu possède une valeur valide (pour le diviser par 100 sinon NA)
+steamData <- steamData %>%
+  mutate(initial_price = if_else(!is.na(initial_price), as.double(initial_price) / 100, NA) )
+
+# Ajouter les colonnes "proportion_avis_positif" et "proportion_avis_positif_steamspy"
+steamData <- steamData %>%
+  mutate(
+    proportion_avis_positif = if_else(total != 0, positive / total, NA),
+    proportion_avis_positif_steamspy = if_else((steamspy_positive + steamspy_negative) != 0, steamspy_positive / (steamspy_positive + steamspy_negative), NA)
+  )
+
+# Transformer les données string en valeurs 
+steamData <- steamData %>%
+  mutate(
+    release_date = ymd(release_date),
+    initial_price = as.numeric(initial_price),
+    price = as.numeric(price),
+    concurrent_users_yesterday = as.numeric(concurrent_users_yesterday),
+    metacritic_score = as.numeric(metacritic_score),
+    steamspy_score_rank = as.numeric(steamspy_score_rank),
+    recommendations = as.numeric(recommendations)
   )
 
 # Utilisé par Florian
@@ -152,7 +200,333 @@ games <- read_delim("./data/clean_games.csv", delim=";", show_col_types = FALSE)
 steamspy <- read_csv("data/steamspy.csv")
 ```
 
-### ------------------------------------------------------------------------
+## -------------------------------------------------------------------------
+
+# Analyse descriptive
+
+Dans cette partie, nous allons chercher à analyser les différentes variables de notre dataset importé afin d'appréhender les données que nous avons choisis. Nous chercherons à calculer les moyennes et les écarts-types des variables numériques (pour le prix, le nombre d'avis, etc...).
+Nous étudierons également la répartition de différentes valeurs au sein du dataset (tags/owner_range, etc..).
+Enfin, nous construirons également une matrice de corrélation afin d'examiner les possibles relations entre les variables du dataset.
+
+##Moyennes et Écarts-types
+
+```{r mean_and_sd, results='markup'}
+# Variables pertinents pour la moyenne et l'écart-type
+steamSummarise = steamData %>%
+  summarise(
+    moyenne_joueurs = mean(concurrent_users_yesterday, na.rm = TRUE),
+    ecart_type_joueurs = sd(concurrent_users_yesterday, na.rm = TRUE),
+    moyenne_prix = mean(price, na.rm=TRUE),
+    ecart_type_prix = sd(price, na.rm = TRUE),
+    moyenne_note = mean(review_score, na.rm=TRUE),
+    ecart_type_note = sd(review_score, na.rm=TRUE),
+    moyenne_metacritic_score = mean(metacritic_score, na.rm=TRUE),
+    ecart_type_metacritic_score = sd(metacritic_score, na.rm=TRUE),
+    moyenne_avis = mean(total, na.rm=TRUE),
+    ecart_type_avis = sd(total, na.rm=TRUE),
+)
+
+# 1. Transforme en dataframe clé/valeur
+df_long <- steamSummarise %>%
+  pivot_longer(everything(), names_to = "variable_stat", values_to = "valeur")
+
+# 2. Sépare la colonne variable_stat en stat (moyenne/écart_type) et variable
+df_long <- df_long %>%
+  mutate(
+    stat = case_when(
+      grepl("^moyenne", variable_stat) ~ "Moyenne",
+      grepl("^ecart_type", variable_stat) ~ "Écart-type"
+    ),
+    variable = gsub("^(moyenne|ecart_type)_", "", variable_stat)
+  ) %>%
+  select(variable, stat, valeur)
+
+# 3. On remet au format large avec une colonne par stat
+tableau_stat <- df_long %>%
+  pivot_wider(names_from = stat, values_from = valeur) %>%
+  mutate(variable = case_when(
+    variable == "joueurs" ~ "Nombre de joueurs actif",
+    variable == "prix" ~ "Prix",
+    variable == "note" ~ "Note sur Steam",
+    variable == "metacritic" ~ "Note Metacritic",
+    variable == "avis" ~ "Nombre d'avis",
+    TRUE ~ variable
+  ))
+
+# Affichage
+kable(tableau_stat, col.names = c("Variable", "Moyenne", "Ecart-Type"), caption = "Statistiques descriptives principales", digits = 2)
+```
+
+Notes :
+
+- La moyenne des notes Metacritics ne concerne que les jeux ayant cette note
+- La moyenne des prix ne concerne uniquement les jeux payants
+
+## Répartition de différentes variables
+
+### Répartition de la plage de propriétaires des jeux Steam
+
+```{r owner_count_repartition, results='markup'}
+# Compter le nombre de jeux par plage de propriétaires
+owners_count <- steamData %>%
+  group_by(owners_range) %>%
+  summarise(nb_jeux = n(), .groups = "drop")
+
+# Enlever la colonne "NA" et traiter les plages
+owners_count_clean <- owners_count %>%
+  filter(!is.na(owners_range)) %>%
+  mutate(
+    # Extraire la borne inférieure comme nombre (en retirant les virgules)
+    owners_min = as.numeric(str_remove_all(str_extract(owners_range, "^[0-9,]+"), ",")),
+    # Réordonner selon la borne inférieure
+    owners_range = fct_reorder(owners_range, owners_min)
+  )
+
+# Fonction pour convertir les nombres en format court (ex: 10000 -> 10k, 1000000 -> 1M)
+shorten_number <- function(x) {
+  x <- as.numeric(gsub(",", "", x))
+  if (is.na(x)) return(NA_character_)
+  else if (x >= 1e6) return(paste0(x / 1e6, "M"))
+  else if (x >= 1e3) return(paste0(x / 1e3, "k"))
+  else return(as.character(x))
+}
+
+# Modifier les labels en remplaçant " .. " par " - " et en raccourcissant les nombres
+owners_count_clean <- owners_count_clean %>%
+  mutate(
+    owners_range_char = as.character(owners_range),
+    owners_range_short = sapply(strsplit(owners_range_char, " \\.\\. "), function(x) {
+      paste0(shorten_number(x[1]), " - ", shorten_number(x[2]))
+    }),
+    # Convertir en facteur en gardant l'ordre d'origine (avec owners_range)
+      owners_range_short = factor(owners_range_short, levels = owners_range_short[order(owners_min)])
+  )
+
+# Visualisation
+ggplot(owners_count_clean, aes(x = nb_jeux, y = owners_range_short)) +
+  geom_col(fill = "#99CCFF") +
+  
+  # Labels à l'intérieur des barres pour les grandes valeurs (>= 100)
+  geom_text(
+    data = owners_count_clean %>% filter(nb_jeux >= 100),
+    aes(x = nb_jeux, label = label_number(big.mark = " ")(nb_jeux)),
+    hjust = 1.2, color = "#002244", size = 3.5
+  ) +
+  
+  # Labels à l'extérieur à droite pour les petites valeurs (< 100)
+  geom_text(
+    data = owners_count_clean %>% filter(nb_jeux < 100),
+    aes(x = nb_jeux, label = label_number(big.mark = " ")(nb_jeux)),
+    hjust = -0.2, color = "#002244", size = 3.5
+  ) +
+  
+  scale_x_continuous(
+    trans = pseudo_log_trans(base = 10),
+    breaks = c(1, 10, 100, 1000, 10000, 100000),
+    labels = label_number(big.mark = " ")
+  ) +
+  labs(
+    title = "Nombre de jeux par plage de propriétaires",
+    x = "Nombre de jeux (échelle pseudo-log)",
+    y = "Plage de propriétaires"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title.y = element_text(size = 12),
+    axis.title.x = element_text(size = 12),
+    axis.text.y = element_text(size = 8)
+  ) +
+  coord_cartesian(clip = "off")
+```
+
+Note :
+
+- Ces données proviennent de SteamSpy. Un autre outil existe pour estimer le nombre de copies vendues au total (Gamalytic), mais ce service est payant
+
+### Répartition des jeux Steam sortis par année
+
+```{r game_released_by_year, results='markup'}
+# Extraire l'année et compter les jeux par année
+jeux_par_annee <- steamData %>%
+  mutate(annee_sortie = lubridate::year(release_date)) %>%
+  filter(!is.na(annee_sortie)) %>%
+  group_by(annee_sortie) %>%
+  summarise(nb_jeux = n()) %>%
+  arrange(annee_sortie)
+
+ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
+  geom_col(fill = "#2C7FB8") +
+  scale_x_continuous(breaks = pretty(jeux_par_annee$annee_sortie, n = 10)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Nombre de jeux sortis par année",
+    x = "Année de sortie",
+    y = "Nombre de jeux"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12)
+  )
+```
+
+```{r game_released_by_year_log, results='markup'}
+
+ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
+  geom_col(fill = "#2C7FB8") +
+  scale_x_continuous(breaks = pretty(jeux_par_annee$annee_sortie, n = 10)) +
+  scale_y_continuous(
+    trans = pseudo_log_trans(base = 10),
+    breaks = c(1, 10, 100, 1000, 10000, 20000),
+    labels = comma_format()
+  ) +
+  labs(
+    title = "Nombre de jeux sortis par année (échelle pseudo-logarithmique)",
+    x = "Année de sortie",
+    y = "Nombre de jeux (pseudo-log scale)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12)
+  )
+```
+
+Notes : 
+On observe l'absence de jeux sortis en 2002 et une augmentation nette à partir de 2006.
+Une explication plausible est que la plateforme Steam est sortie en 2003 et était dédiée à la distribution des mises à jour des jeux Valve. C'est qu'à la fin de l'année 2005 que Steam décide de distribuer des jeux tiers sur son marché.
+
+Source : [Lien Wikipédia de Steam](https://en.wikipedia.org/wiki/Steam_\(service\))
+
+### Répartition des genres des jeux Steam
+
+```{r genres, results='markup'}
+# Séparer les genres (s'ils sont séparés par des virgules), enlever les espaces, et compter
+genres_par_jeu <- steamData %>%
+  filter(!is.na(genres)) %>%
+  separate_rows(genres, sep = ",") %>%
+  mutate(genres = str_trim(genres)) %>%
+  group_by(genres) %>%
+  summarise(nb_jeux = n()) %>%
+  arrange(desc(nb_jeux)) %>%
+  filter(nb_jeux > 1000)
+
+genres_par_jeu %>%
+  mutate(genres = fct_reorder(genres, nb_jeux)) %>%  # trie les genres selon le nombre de jeux
+  ggplot(aes(x = nb_jeux, y = genres)) +
+  geom_col(fill = "#1f77b4") +
+  geom_text(aes(label = comma(nb_jeux)), hjust = -0.1, color = "black", size = 3) +
+  labs(
+    title = "Nombre de jeux par genre",
+    x = "Nombre de jeux",
+    y = "Genre"
+  ) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.1)), labels = comma_format()) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12)
+  )
+```
+
+Note :
+
+- Nous avons retiré les genres qui ne comptaient moins de 1000 jeux pour se concentrer sur les genres principaux des jeux Steam. La plupart des autres genres retirés étaient des genres de niche (Cinéma ou d'autres genres concernant les logiciels disponibles sur Steam).
+
+## Matrice de corrélation
+
+```{r correlation_matrix, results='markup'}
+# Matrice de corrélation
+numeric_cols <- steamData %>%
+  select(
+    users = concurrent_users_yesterday,
+    prix = price,
+    prix_init = initial_price,
+    avis_pos = positive,
+    avis_neg = negative,
+    avis_total = total,
+    note_utilisateur = review_score,
+    note_metacritic = metacritic_score,
+    pos_spy = steamspy_positive,
+    neg_spy = steamspy_negative,
+    reco = recommendations,
+    prop_positif = proportion_avis_positif,
+    prop_positif_spy = proportion_avis_positif_steamspy
+  ) %>% 
+  filter(!is.na(avis_pos), !is.na(avis_neg), !is.na(note_utilisateur))
+
+# 1. Calcul matrice corrélation
+cor_matrix <- numeric_cols %>%
+  select_if(is.numeric) %>%
+  correlate()
+
+vars <- cor_matrix$term
+
+# 2. Passage en format long avec diagonale incluse
+cor_long <- cor_matrix %>%
+  pivot_longer(-term, names_to = "y", values_to = "r") %>%
+  rename(x = term) %>%
+  mutate(
+    pos_x = match(x, vars),
+    pos_y = match(y, vars),
+    is_diag = pos_x == pos_y
+  ) %>%
+  filter(pos_x >= pos_y)
+
+# 3. Plot ggplot avec diagonale gris clair
+ggplot(cor_long, aes(x = x, y = y)) +
+  geom_tile(
+    data = cor_long %>% filter(!is_diag),
+    aes(fill = r),
+    color = "white"
+  ) +  # triangle supérieur
+  geom_tile(
+    data = cor_long %>% filter(is_diag),
+    fill = "grey90",    # diagonale sobre en gris clair
+    color = "white"
+  ) +
+  geom_text(
+    aes(label = ifelse(is_diag, "", round(r, 2))),
+    color = "black",
+    size = 3
+  ) +
+  scale_fill_gradient2(
+    low = "blue", high = "red",
+    limit = c(0, 1),
+    name = "Corrélation"
+  ) +
+  scale_x_discrete(position = "top", limits = rev(vars)) +
+  scale_y_discrete(limits = rev(vars)) +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = NULL,
+    caption = "Matrice de corrélation de différentes variables du dataset"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 0, vjust = 0.5, size = 10),
+    axis.text.y = element_text(size = 10),
+    plot.caption = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank()
+  ) +
+  coord_fixed(ratio = 1)
+```
+
+Avec cette matrice de corrélation, on peut noter les remarques suivantes :
+
+- Le nombre d'avis positif semble être corrélé avec le nombre de recommendation (0.93)
+- La note Metacritic n'est pas forcément corrélé avec la proportion de notes positives (0.53)
+- Certaines valeurs obtenues doivent être discutées comme la corrélation entre le nombre de recommendation et le nombre d'avis positive/négative. En effet, comme il s'agit d'une valeur comptée, cela peut biaiser l'interprétation de la corrélation. En prenant en compte la proportion, nous obtenons une valeur quasi-nulle. 
+
+Notes :
+
+- Il n'existe pas de corrélation négative dans nos données
+- Nous avons omis la proportion d'avis négative dans le tableau car nous obtenons juste le résultat inverse que pour celui du positif (corrélation négative)
+
+## ------------------------------------------------------------------------
 
 ### Partie Analyse Prix (Florian LOPITAUX)
 
