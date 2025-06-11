@@ -1166,6 +1166,7 @@ Nous sommes également limité par l'explicité des tags, par exemple, Coop onli
 
 
 
+
 ```{r}
 #caté les plus populaires sur steam
 # Nécessite les packages suivants :
@@ -1194,7 +1195,7 @@ cat_pop_long <- cat_pop %>%
   arrange(desc(total_owner_min))
 
 # Sélection des 50 catégories les plus populaires
-top50_cat <- cat_pop_long %>% slice_max(total_owner_min, n = 50)
+top50_cat <- cat_pop_long %>% slice_max(total_owner_min, n = 20)
 
 # Affichage du graphique avec catégories en abscisse
 ggplot(top50_cat, aes(x = reorder(categories, total_owner_min), y = total_owner_min)) +
@@ -1223,47 +1224,6 @@ ggplot(top50_cat, aes(x = reorder(categories, total_owner_min), y = total_owner_
 
 
 ```{r}
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(lubridate)
-
-# On suppose que 'tags' contient app_id et tag (un tag par ligne)
-# Et que 'clean_games' contient release_date (format AAAA-MM-JJ) et app_id
-
-# Joindre les tags et les dates de sortie
-games_tags <- left_join(tags, clean_games %>% select(app_id, release_date), by = "app_id") %>%
-  filter(!is.na(tag), !is.na(release_date)) %>%
-  mutate(year = year(ymd(release_date)))
-
-# Compter le nombre de jeux par tag et par année
-genre_year <- games_tags %>%
-  group_by(year, tag) %>%
-  summarise(n = n(), .groups = "drop")
-
-# Choisir les 6 tags les plus fréquents (pour la lisibilité du graphique)
-top_tags <- genre_year %>%
-  group_by(tag) %>%
-  summarise(total = sum(n)) %>%
-  arrange(desc(total)) %>%
-  slice_head(n = 10) %>%
-  pull(tag)
-
-genre_year_top <- genre_year %>% filter(tag %in% top_tags)
-
-# Graphique d'évolution des principaux genres/tags
-ggplot(genre_year_top, aes(x = year, y = n, color = tag)) +
-  geom_line(linewidth = 1.1) +        # <-- utilise linewidth
-  geom_point(size = 1.6) +
-  labs(
-    title = "Évolution du nombre de jeux sortis par genre/tag (top 6)",
-    x = "Année de sortie",
-    y = "Nombre de jeux sortis",
-    color = "Tag"
-  ) +
-  theme_minimal(base_size = 10)
-
-
 
 library(dplyr)
 library(tidyr)
@@ -1292,7 +1252,7 @@ ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
   geom_line(linewidth = 1.1) +
   geom_point(size = 1.6) +
   labs(
-    title = "Évolution du nombre de jeux sortis par tag (tous jeux, top 10 tags)",
+    title = "Évolution du nombre de jeux sortis par tag ",
     x = "Année de sortie",
     y = "Nombre de jeux sortis",
     color = "Tag"
@@ -1312,19 +1272,19 @@ top_tags_pre2015 <- genre_year_pre2015 %>%
   pull(tag)
 genre_year_pre2015_top <- genre_year_pre2015 %>% filter(tag %in% top_tags_pre2015)
 
-# Graphique avant 2015
+# Graphique avant 2013 et après 2005
 ggplot(genre_year_pre2015_top, aes(x = year, y = n, color = tag)) +
   geom_line(linewidth = 1.1) +
   geom_point(size = 1.6) +
   labs(
-    title = "Évolution des tags pour les jeux sortis avant ou en 2015 (top 10 tags)",
+    title = "Évolution des tags pour les jeux sortis avant ou en 2013",
     x = "Année de sortie",
     y = "Nombre de jeux sortis",
     color = "Tag"
   ) +
   theme_minimal(base_size = 10)
 
-## 3. Jeux sortis après 2015 (top 10 tags)
+## 3. Jeux sortis après 2013 
 games_tags_post2015 <- games_tags %>% filter(year > 2013)
 genre_year_post2015 <- games_tags_post2015 %>%
   group_by(year, tag) %>%
@@ -1337,12 +1297,12 @@ top_tags_post2015 <- genre_year_post2015 %>%
   pull(tag)
 genre_year_post2015_top <- genre_year_post2015 %>% filter(tag %in% top_tags_post2015)
 
-# Graphique après 2015
+# Graphique après 2013
 ggplot(genre_year_post2015_top, aes(x = year, y = n, color = tag)) +
   geom_line(linewidth = 1.1) +
   geom_point(size = 1.6) +
   labs(
-    title = "Évolution des tags pour les jeux sortis après 2015 (top 10 tags)",
+    title = "Évolution des tags pour les jeux sortis après 2013",
     x = "Année de sortie",
     y = "Nombre de jeux sortis",
     color = "Tag"
@@ -1351,3 +1311,156 @@ ggplot(genre_year_post2015_top, aes(x = year, y = n, color = tag)) +
 
 
 ```
+
+
+```{r}
+# 1. Préparation des données
+games_tags <- left_join(tags, clean_games %>% select(app_id, release_date), by = "app_id") %>%
+  filter(!is.na(tag), !is.na(release_date)) %>%
+  mutate(year = year(ymd(release_date)))
+
+games_with_owners <- games_tags %>%
+  left_join(
+    steamspy %>%
+      mutate(owner_min = as.numeric(str_replace_all(str_extract(owners_range, "^[0-9,]+"), ",", ""))),
+    by = "app_id"
+  ) %>%
+  left_join(clean_games %>% select(app_id, name), by = "app_id")
+
+# 2. Fonction utilitaire pour top jeu par année
+get_top_game_by_year <- function(df) {
+  df %>%
+    group_by(year, app_id, name) %>%
+    summarise(owner_min = max(owner_min, na.rm = TRUE), .groups = "drop") %>%
+    filter(!is.na(year), !is.na(owner_min)) %>%
+    group_by(year) %>%
+    slice_max(order_by = owner_min, n = 1, with_ties = FALSE) %>%
+    ungroup()
+}
+
+# 3. Fonction utilitaire pour placer les labels en haut
+get_label_position <- function(curve_data, top_game_data) {
+  max_y_per_year <- curve_data %>%
+    group_by(year) %>%
+    summarise(y_max = max(n), .groups = "drop")
+  left_join(top_game_data, max_y_per_year, by = "year")
+}
+
+### --- Période avant ou en 2013 ---
+games_pre2013 <- games_with_owners %>% filter(year <= 2013) %>% filter(year > 2005)
+genre_year_pre2013 <- games_pre2013 %>%
+  group_by(year, tag) %>%
+  summarise(n = n(), .groups = "drop")
+top_tags_pre2013 <- genre_year_pre2013 %>%
+  group_by(tag) %>%
+  summarise(total = sum(n)) %>%
+  arrange(desc(total)) %>%
+  slice_head(n = 10) %>%
+  pull(tag)
+genre_year_pre2013_top <- genre_year_pre2013 %>% filter(tag %in% top_tags_pre2013)
+top_game_pre2013 <- get_top_game_by_year(games_pre2013)
+top_game_pre2013_label <- get_label_position(genre_year_pre2013_top, top_game_pre2013)
+
+### --- Période après 2013 ---
+games_post2013 <- games_with_owners %>% filter(year > 2013)
+genre_year_post2013 <- games_post2013 %>%
+  group_by(year, tag) %>%
+  summarise(n = n(), .groups = "drop")
+top_tags_post2013 <- genre_year_post2013 %>%
+  group_by(tag) %>%
+  summarise(total = sum(n)) %>%
+  arrange(desc(total)) %>%
+  slice_head(n = 10) %>%
+  pull(tag)
+genre_year_post2013_top <- genre_year_post2013 %>% filter(tag %in% top_tags_post2013)
+top_game_post2013 <- get_top_game_by_year(games_post2013)
+top_game_post2013_label <- get_label_position(genre_year_post2013_top, top_game_post2013)
+
+### --- Période globale (toutes années) ---
+genre_year_all <- games_with_owners %>%
+  group_by(year, tag) %>%
+  summarise(n = n(), .groups = "drop")
+top_tags_all <- genre_year_all %>%
+  group_by(tag) %>%
+  summarise(total = sum(n)) %>%
+  arrange(desc(total)) %>%
+  slice_head(n = 10) %>%
+  pull(tag)
+genre_year_all_top <- genre_year_all %>% filter(tag %in% top_tags_all)
+top_game_all <- get_top_game_by_year(games_with_owners)
+top_game_all_label <- get_label_position(genre_year_all_top, top_game_all)
+
+# --- Graphique 1 : avant ou en 2013 ---
+ggplot(genre_year_pre2013_top, aes(x = year, y = n, color = tag)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 1.6) +
+  geom_vline(
+    data = top_game_pre2013_label, 
+    aes(xintercept = year), 
+    linetype = "dotted", color = "black", linewidth = 0.6
+  ) +
+  geom_text(
+    data = top_game_pre2013_label,
+    aes(x = year, y = y_max, label = stringr::str_trunc(name, 15, "right")),
+    color = "black",
+    angle = 90, vjust = -0.5, hjust = 0, size = 2.7
+  ) +
+  labs(
+    title = "Évolution des tags - Jeux sortis avant ou en 2013\n+ jeu le plus possédé chaque année",
+    x = "Année de sortie",
+    y = "Nombre de jeux sortis",
+    color = "Tag"
+  ) +
+  theme_minimal(base_size = 10)
+
+# --- Graphique 2 : après 2013 ---
+ggplot(genre_year_post2013_top, aes(x = year, y = n, color = tag)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 1.6) +
+  geom_vline(
+    data = top_game_post2013_label, 
+    aes(xintercept = year), 
+    linetype = "dotted", color = "black", linewidth = 0.6
+  ) +
+  geom_text(
+    data = top_game_post2013_label,
+    aes(x = year, y = y_max, label = stringr::str_trunc(name, 15, "right")),
+    color = "black",
+    angle = 90, vjust = -0.5, hjust = 0, size = 2.7
+  ) +
+  labs(
+    title = "Évolution des tags - Jeux sortis après 2013\n+ jeu le plus possédé chaque année",
+    x = "Année de sortie",
+    y = "Nombre de jeux sortis",
+    color = "Tag"
+  ) +
+  theme_minimal(base_size = 10)
+
+# --- Graphique 3 : global ---
+ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 1.6) +
+  geom_vline(
+    data = top_game_all_label, 
+    aes(xintercept = year), 
+    linetype = "dotted", color = "black", linewidth = 0.6
+  ) +
+  geom_text(
+    data = top_game_all_label,
+    aes(x = year, y = y_max, label = stringr::str_trunc(name, 15, "right")),
+    color = "black",
+    angle = 90, vjust = -0.5, hjust = 0, size = 2.7
+  ) +
+  labs(
+    title = "Évolution des tags - Toutes années\n+ jeu le plus possédé chaque année ",
+    x = "Année de sortie",
+    y = "Nombre de jeux sortis",
+    color = "Tag"
+  ) +
+  theme_minimal(base_size = 10)
+
+```
+
+
+
+
