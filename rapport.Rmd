@@ -2,7 +2,9 @@
 title: "Rapport Analyse IF36 - Catalogue des jeux Steam"
 author: "Hoang-Viêt LE, Paul LASSASEIGNE, Florian LOPITAUX et Jules PERRIN"
 date: "2025-04-28"
-output: html_document
+output:
+  html_document:
+    template: template.html
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(

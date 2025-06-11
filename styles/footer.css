@@ -1,0 +1,40 @@
+footer {
+  background-color: #171a21;
+  padding: 5rem 25rem 5rem 25rem;
+
+  .line {
+    border-top: 1px solid #363c44;
+    margin: 2.5rem 0;
+  }
+  
+  .footer__content-logo {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    img {
+      width: 9.2rem;
+    }
+  }
+
+  .footer__content-info {
+    font-size: 1.2rem;
+    line-height: 1.6rem;
+    color: #8F98A0;
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+
+    a {
+      font-size: 1.3rem;
+      color: #C6D4DF;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: white;
+    }
+  }
+}

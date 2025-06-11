@@ -1,0 +1,35 @@
+header {
+  background-color: #171D25;
+
+  .menu {
+    display: flex;
+    align-items: center;
+    padding: 3rem 5rem;
+    height: 100%;
+    gap: 2.5rem;
+    justify-content: center;
+  
+    .menu__logo {
+      width: 17.6rem;
+    }
+  
+    .menu__links {
+      display: flex;
+      gap: 3rem;
+    }
+  
+    .menu__link {
+      font-size: 1.4rem;
+      text-align: center;
+      text-transform: uppercase;
+      color: #dcdedf;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.25s ease-in-out;
+    }
+  
+    .menu__link:hover {
+      color: #fff; 
+    }
+  }
+}
