@@ -20,9 +20,19 @@ knitr::opts_chunk$set(
 -   Jules PERRIN
 -   Florian LOPITAUX
 
+# Steam
+
+Steam est une plateforme de distribution de jeux vidéo développée par Valve.
+
+Elle permet aux utilisateurs d’acheter, télécharger et jouer à une grande variété de jeux sur PC, Mac et Linux. En plus de proposer un vaste catalogue de jeux (environ 140 000 jeux), Steam offre des évaluations et avis de joueurs sur les jeux de son catalogue.
+
+![](img/store_home_share.jpg)
+
 # Données
 
-Dans le cadre de notre projet, nous avons choisi d'étudier divers jeux de données autour du catalogue de jeux Steam. Les datasets utilisés lors de ce projet sont les suivants : - [Dataset de NewbieIndieGameDev datant d'Octobre 2024](https://github.com/NewbieIndieGameDev/steam-insights) (140 000 jeux recensés)
+Dans le cadre de notre projet, nous avons choisi d'étudier divers jeux de données autour du catalogue de jeux Steam. Les datasets utilisés lors de ce projet sont les suivants :
+
+- [Dataset de NewbieIndieGameDev datant d'Octobre 2024](https://github.com/NewbieIndieGameDev/steam-insights) (140 000 jeux recensés)
 
 Les datasets sont sous format de différents fichiers csv. Cependant, NewbieIndieGameDev utilisant probablement un logiciel tiers pour manipuler ses données, certains csv sont mal formatés et imparsables par un programme (données json dans une colonne, balises html, ...). <br> Nous devons donc les modifier au préalable. Nous avons déjà "reformaté" le fichier **games.csv** afin de le rendre lisible par nos programmes et vérifier que nous sommes bien capables de les traiter pour notre projet. <br> Ainsi dans le dossier data : pour chaque fichier qui possède ce problème, il y aura un fichier **raw\_**<nom_du_fichier>.csv qui sont les données brutes ("illisibles") et **clean\_**<nom_du_fichier>.csv qui sont les données reformatées pour qu'elles soient "lisibles".
 
@@ -107,11 +117,6 @@ Voici une liste non exhaustive des variables comparées ainsi que les visualisat
 
 
 ## ------------------------------------------------------------------------
-
-
-# Exploration des données
-
-## Importations des données
 
 ```{r import}
 library(scales)
@@ -200,15 +205,13 @@ games <- read_delim("./data/clean_games.csv", delim=";", show_col_types = FALSE)
 steamspy <- read_csv("data/steamspy.csv")
 ```
 
-## -------------------------------------------------------------------------
-
 # Analyse descriptive
 
 Dans cette partie, nous allons chercher à analyser les différentes variables de notre dataset importé afin d'appréhender les données que nous avons choisis. Nous chercherons à calculer les moyennes et les écarts-types des variables numériques (pour le prix, le nombre d'avis, etc...).
-Nous étudierons également la répartition de différentes valeurs au sein du dataset (tags/owner_range, etc..).
+Nous étudierons également la répartition de différentes valeurs au sein du dataset (tags, owner_range, etc..).
 Enfin, nous construirons également une matrice de corrélation afin d'examiner les possibles relations entre les variables du dataset.
 
-##Moyennes et Écarts-types
+## Moyennes et Écarts-types
 
 ```{r mean_and_sd, results='markup'}
 # Variables pertinents pour la moyenne et l'écart-type
@@ -248,18 +251,18 @@ tableau_stat <- df_long %>%
     variable == "joueurs" ~ "Nombre de joueurs actif",
     variable == "prix" ~ "Prix",
     variable == "note" ~ "Note sur Steam",
-    variable == "metacritic" ~ "Note Metacritic",
+    variable == "metacritic_score" ~ "Note Metacritic",
     variable == "avis" ~ "Nombre d'avis",
     TRUE ~ variable
   ))
 
 # Affichage
-kable(tableau_stat, col.names = c("Variable", "Moyenne", "Ecart-Type"), caption = "Statistiques descriptives principales", digits = 2)
+kable(tableau_stat, col.names = c("Variable", "Moyenne", "Ecart-Type"), caption = "Statistiques descriptives des principales variables", digits = 2)
 ```
 
 Notes :
 
-- La moyenne des notes Metacritics ne concerne que les jeux ayant cette note
+- La moyenne des notes Metacritics ne concerne que les jeux ayant reçu cette note
 - La moyenne des prix ne concerne uniquement les jeux payants
 
 ## Répartition de différentes variables
@@ -394,8 +397,9 @@ ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
 ```
 
 Notes : 
-On observe l'absence de jeux sortis en 2002 et une augmentation nette à partir de 2006.
-Une explication plausible est que la plateforme Steam est sortie en 2003 et était dédiée à la distribution des mises à jour des jeux Valve. C'est qu'à la fin de l'année 2005 que Steam décide de distribuer des jeux tiers sur son marché.
+
+- On observe l'absence de jeux sortis en 2002 et une augmentation nette à partir de 2006.
+- Une explication plausible est que la plateforme Steam est sortie en 2003 et était dédiée à la distribution des mises à jour des jeux Valve. C'est qu'à la fin de l'année 2005 que Steam décide de distribuer des jeux tiers sur son marché.
 
 Source : [Lien Wikipédia de Steam](https://en.wikipedia.org/wiki/Steam_\(service\))
 
@@ -524,7 +528,7 @@ Avec cette matrice de corrélation, on peut noter les remarques suivantes :
 Notes :
 
 - Il n'existe pas de corrélation négative dans nos données
-- Nous avons omis la proportion d'avis négative dans le tableau car nous obtenons juste le résultat inverse que pour celui du positif (corrélation négative)
+- Nous avons omis la proportion d'avis négative dans le tableau car nous obtenons juste le résultat inverse que pour la corrélation pour les avis positive.
 
 ## ------------------------------------------------------------------------
 
@@ -648,55 +652,63 @@ Notre hypothèse concernant les moyens et coûts de traduction qui pourraient im
 ### ------------------------------------------------------------------------
 
 
-## Types des jeux en lignes sur Steam (Hoang-Viêt LE)
+## 🕹️ Types de jeux en ligne sur Steam (Hoang-Viêt LE)
 
-### Différences entre "Catégorie" et "Tag"
+### 🔍 Différences entre Catégorie et Tag
 
 Sur Steam, il existe deux types de variables qui permettent de classer les jeux présents sur la plateforme :
 
--   Catégories : classifications officielles attribuées par Steam. Elles décrivent les fonctionnalités principales d'un jeu (par exemple : Multijoueur, Succès Steam, Support manette, Mode coopératif, etc.). Ce sont des critères souvent liés à l'expérience utilisateur et aux fonctionnalités techniques du jeu.
+- **Catégories** : classifications officielles attribuées par Steam. Elles décrivent les fonctionnalités principales du jeu.
+Exemples : `Multijoueur`, `Succès Steam`, `Support manette`, `Mode coopératif`.
 
--   Tags : classifications collaboratives créées par les utilisateurs de Steam. Ils permettent de décrire le contenu, l'ambiance ou le style d'un jeu (par exemple : Puzzle, Narratif, Indépendant, FPS, Monde ouvert, etc.). Les tags sont plus subjectifs et peuvent varier en popularité selon la communauté.
+- **Tags** : classifications collaboratives créées par les utilisateurs. Ils décrivent le contenu, l’ambiance ou le style du jeu.
+Exemples : `Puzzle`, `Narratif`, `Indépendant`, `FPS`, `Monde ouvert`.
 
-![Tags et Catégories de Portal 2 sur Steam](img/portal_tag_categories.png)
+![Tags et Catégories de Portal 2 sur Steam](img/portal_tag_categories.png){width=50%}
 
-### Contexte et problématique
+### 📌 Contexte et problématique
 
-C'est sur la plateforme Steam que l'on a vu naître les premiers jeux en ligne et le développement de celui-ci avec des jeux mythiques comme Counter Strike, Team Forteress, etc... D'autres types de jeux sont aussi devenus populaires au cours du temps comme les MMORPG, les Battle-Royale, etc... Nous voulons voir les tendances actuelles et quels types de jeux attirent principalement les joueurs de Steam.
+Steam est un acteur majeur dans le développement du jeu en ligne avec des titres cultes comme Counter-Strike ou Team Fortress. Au fil des années, d'autres genres comme les MMORPG, Battle Royale ou les jeux en coopération ont gagné en popularité.
+Nous voulons voir les tendances actuelles et quels types de jeux attirent principalement les joueurs de Steam.
 
 Notre problématique est alors la suivante :
 
-Quels sont les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
+> Quels sont les types de jeu en ligne les plus populaires sur Steam ? (FPS, MMO, etc...)
 
 ### Définition de jeu en ligne
 
-Une définition de jeu en ligne sera un jeu vidéo dont l'expérience se repose sur l'intéraction entre plusieurs joueurs en temps réel. On distingue différents types de jeu en ligne :
+Pour commencer notre analyse, il faut tout d'abord définir le terme de **jeu en ligne**.
 
--   MMO (Massive Multiplayer Online)
--   Jeux coméptitifs (FPS, MOBA, Battle Royale)
--   Jeux collaboratifs (Eurotruck 2)
+Une définition de jeu en ligne sera un jeu vidéo dont l'expérience se repose sur l'intéraction entre plusieurs joueurs en temps réel.
 
-### Critères "jeu en ligne" :
+Typologies principales :
 
-Dans nos données, nous identifierons un jeu comme "jeu en ligne" s'il possède les catégories ou tags suivants :
+- `MMO` (Massively Multiplayer Online)
+- `Jeux compétitifs` (FPS, MOBA, Battle Royale)
+- `Jeux collaboratifs` (ex : Euro Truck Simulator 2)
 
--   "Multi-player", "Massively Multiplayer", "Online Co-op", ou d'autres tags associés.
+### ✅ Critères d'identification "jeu en ligne" :
 
-### Critère "popularité" :
+**_Pour qu’un jeu soit considéré comme en ligne :_**
 
-Le critère "popularité" sera basée sur le nombre de joueurs actifs en Octobre 2024.
+Il doit contenir au moins un des éléments suivants dans ses catégories ou tags :
 
-### Types de jeux en ligne
+- `Multiplayer`, `Massively Multiplayer`, `Online Co-op`, etc.
 
-Pour analyser les type de jeux les plus populaires pour les jeux en ligne et regarder sa distribution dans le magasin Steam, on va considérer les tags suivants uniquement :
+**_Pour mesurer la popularité :_**
+On utilise le nombre de joueurs actifs en octobre 2024 (`concurrent_users_yesterday` dans les données).
 
--   FPS Multijoueur
--   Battle Royale
--   RPG en ligne
--   Coopération en ligne
--   Sandbox
--   Survival Multiplayer
--   Autres (correspondant aux autres tags non classés)
+### 🧩 Types de jeux en ligne
+
+Pour analyser les type de jeux les plus populaires pour les jeux en ligne et regarder sa distribution dans le magasin Steam, on a retenu les tags suivants uniquement :
+
+-   **FPS Multijoueur**
+-   **Battle Royale**
+-   **RPG en ligne**
+-   **Coopération en ligne**
+-   **Sandbox**
+-   **Survival Multiplayer**
+-   **Autres** (correspondant aux autres tags non classés)
 
 ```{r get_infos_online_games, include=FALSE}
 # Détecter les jeux multijoueurs
@@ -733,7 +745,7 @@ popularite_types <- jeux_en_ligne_type %>%
 
 ```
 
-### Analyse des résultats
+### 📊 Analyse des résultats
 
 Voici la répartition des joueurs sur la plateforme Steam sur les jeux en lignes :
 
@@ -751,17 +763,28 @@ ggplot(popularite_types, aes(x = reorder(type_de_jeu, total_joueurs_actifs), y =
        y = "Nombre de joueurs actifs (Octobre 2024)")
 ```
 
-### Observations
+### 🔎 Observations
 
-On voit que le genre de jeu en ligne le plus populaire sur Steam est le FPS Multijoueur rassemblant plus d'un tiers des joueurs des jeux en ligne sur Steam représentant 1,5 millions de joueurs avec CS 2 qui représente plus de 1,1 millions de joueurs.
+- 🥇 **FPS Multijoueur** est de loin le genre dominant avec 1,5 million de joueurs actifs, dont 1,1 million sur Counter-Strike 2 à lui seul.
 
-Ensuite, dans la catégorie "Autres", On y compte 1,3 millions joueurs sur des jeux comme Liar's Bar, War Thunder, Civizilation VI, Forza Horizon et Eurotruck Simulator 2. C'est une catégorie regroupant pleins de genres différents.
+- **Autres genres** comptent 1,3 million de joueurs avec des jeux variés comme War Thunder, Euro Truck 2, Civilization VI, etc. Cette catégorie montre la diversité des jeux en ligne.
 
-Ensuite, les Battle Royale rassemble 1 million de joueurs (environ 16,5% des joueurs). Le genre semble être resté populaire mais elle n'a plus la même popularité qu'entre 2018-2020.
+- 🥉 **Battle Royale** regroupe 1 million de joueurs (~16,5 %). Bien qu’en déclin par rapport à 2018-2020, ce genre reste populaire.
 
-Les RPG en ligne représentent 1.2 million de joueurs mais il faut distinguer les différents genre de RPG en ligne.
+- **RPG en ligne** : environ 1,2 million de joueurs. On y trouve :
 
-En effet, dans les RPG en ligne, ils se trouvent les MMO comme Monster Hunter: World, New World: Aeternum ou Destiny 2 mais également des RPG qui peut se jouer en coopération comme Stardew Valley, Baldur's Gate 3, etc...
+  - Des MMORPG (Destiny 2, New World, etc.)
+
+  - Des RPG coopératifs (Baldur’s Gate 3, Stardew Valley)
+
+- **Survival Multijoueur** : 800 000 joueurs sur des titres comme Rust, Satisfactory, Factorio.
+
+- **MOBA** : seulement 550 000 joueurs, dont la grande majorité provient de Dota 2.
+
+
+### 🎯 Les RPG en détails
+
+Nous allons approfondir notre analyse dans le type **RPG** en essayant de séparer et de voir la répartition des RPG en ligne et des MMORPG.
 
 Voici la répartition des joueurs jouant à des MMORPG et des joueurs de RPG classique :
 
@@ -806,19 +829,17 @@ ggplot(proportions_globales, aes(x = "", y = proportion, fill = is_MMO)) +
   )
 ```
 
-Note : Stardew Valley a le tag RPG et est un jeu qui peut se jouer en multijoueur mais peut-on considérer comme un jeu en ligne ? C'est le cas d'autres jeux principalement singleplayer mais qui peut se jouer en multijoueur.
+Note : 
 
-Les Survival Multijoueur représentent une base de 800 000 joueurs sur des jeux phares comme Rust, Factorio, Satisfactory, etc...
+- Stardew Valley a le tag RPG et est un jeu qui peut se jouer en multijoueur mais peut-on considérer comme un jeu en ligne ? C'est le cas d'autres jeux principalement singleplayer mais qui peut se jouer en multijoueur.
 
-Enfin, les MOBA représentent uniquement moins de 550 000 joueurs dont la majorité des joueurs viennent de Dota 2 (500 000 joueurs).
+### ⚠️ Limites de résultats obtenus
 
-### Limites de résultats obtenus
-
--   Les tags Steam et les catégories créées ne sont pas assez précises pour trouver les jeux en ligne car on se retrouve souvent à la frontière d'un jeu avec un système multijoueur et un jeu en ligne.
+-   Les **tags Steam** et les **catégories** créées ne sont **pas assez précises** pour trouver les jeux en ligne car on se retrouve souvent à la frontière d'un jeu avec un système multijoueur et un jeu en ligne.
 
 -   D'autres visualisations au sein des catégories nous permettraient de voir qu'uniquement quelques jeux portent la base de jeu de certains types de jeux comme CS 2 pour les FPS et Dota 2 pour les MOBA.
 
--   Le fait que la catégorie "Autres" possèdent de nombreux jeux en ligne que l'on a pas pu classer montre que le domaine des jeux en ligne est très variée et non cantonnée aux genres que l'on pense habituellement. Globalement, réaliser une classification sur l'ensemble des jeux Steam semble difficile tant certains jeux sont assez particulier pour les catégoriser.
+-   Le fait que la catégorie **"Autres"** possèdent de nombreux jeux en ligne que l'on a pas pu classer montre que le domaine des jeux en ligne est très variée et non cantonnée aux genres que l'on pense habituellement. Globalement, réaliser une classification sur l'ensemble des jeux Steam semble difficile tant certains jeux sont assez particulier pour les catégoriser.
 
 -   Enfin, il faut être conscient que ces données ne concernent que les utilisateurs Steam et non la globalité des joueurs. Par exemple, pour les MMORPG, ceux-ci peuvent être lancés hors Steam. De plus avec l'avènement de l'Epic Game Store, une partie des jeux sont passés sur l'autre plateforme comme Rocket League.
 
@@ -941,6 +962,104 @@ L'analyse du graphique montre que, proportionnellement, les jeux AAA obtiennent 
 
 Cette hypothèse vient du fait que aujourd'hui, les joueurs sont focalisés sur un léger pourcentage de jeux par rapport à l'entièreté du monde du jeu vidéo. Tous les jours de nouveaux jeux sortent, tous les jours il peut y en avoir d'excellents, mais ils ne feront pas le même bruit que les jeux colossaux développés par les grandes entreprises, comme Microsoft, Ubisoft, Activision Blizzard, Rockstar etc...
 
+
+### 🔎 Focus sur différents studios de jeux
+
+Dans cette section, nous nous intéressons à trois studios aux profils très différents afin de comparer les jeux qu’ils produisent, notamment en termes de notes et réception critique :
+
+- **Ubisoft** : un studio mythique et reconnu qui produit des jeux AAA
+- **Supergiant Games** : un studio indépendant qui produit des jeux indépendants
+- **FromSoftware Inc.** : un studio produisant des jeux AAA mais dans un registre différent qu'Ubisoft
+
+L'objectif de cette partie est de regarder les notes des différents jeux des studios avec leurs approches différentes en terme de production de jeux vidéos et d'explorer davantage la question de la notation et de la potentiel influence du tag `indie`.
+Nous allons prendre les 5 jeux de chaque studio ayant obtenu le plus de notes sur Steam.
+
+### Notes obtenus
+
+```{r Ubisoft vs Supergiant, results='markup'}
+# Obtenir les jeux des studios
+ubisoft_games <- steamData %>%
+  filter(str_detect(tolower(developer), "ubisoft")) %>%
+  filter(type=='game') %>%
+  select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total)
+  
+
+supergiant_games <-steamData %>%
+    filter(str_detect(tolower(developer), "supergiant games")) %>%
+    filter(type=='game') %>%
+    select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total)
+
+fromsoftware_games = steamData %>%
+    filter(str_detect(tolower(developer), "fromsoftware")) %>%
+    filter(type=='game') %>%
+    select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total)
+
+# On prends les 5 jeux qui ont le plus d'avis (pas forcément les jeux qui ont le plus de propriétaires)
+top5_ubisoft = ubisoft_games %>%
+  arrange(desc(total)) %>%
+  slice_head(n=5)
+
+top5_supergiant = supergiant_games %>%
+  arrange(desc(total)) %>%
+  slice_head(n=5)
+
+top5_fromsoftware = fromsoftware_games %>%
+  arrange(desc(total)) %>%
+  slice_head(n=5)
+
+# Table Ubisoft
+top5_ubisoft <- top5_ubisoft %>%
+  select(name, release_date, metacritic_score, proportion_avis_positif, total) %>%
+  mutate (proportion_avis_positif = proportion_avis_positif * 100) %>%
+  rename(
+    Jeu = name,
+    `Date de sortie` = release_date,
+    `Note Metacritic` = metacritic_score,
+    `Proportion d'avis positif Steam` = proportion_avis_positif,
+    `Nombre d'avis total` = total
+  )
+
+kable(top5_ubisoft,
+      caption = "Notes des jeux Ubisoft", digits = 2)
+
+# Table Supergiant
+top5_supergiant <- top5_supergiant %>%
+  select(name, release_date, metacritic_score, proportion_avis_positif, total) %>%
+  mutate (proportion_avis_positif = proportion_avis_positif * 100) %>%
+  rename(
+    Jeu = name,
+    `Date de sortie` = release_date,
+    `Note Metacritic` = metacritic_score,
+    `Proportion d'avis positif Steam` = proportion_avis_positif,
+    `Nombre d'avis total` = total
+  )
+
+kable(top5_supergiant,
+      caption = "Notes des jeux Supergiant Games", digits = 2)
+
+# Table Fromsoftware
+top5_fromsoftware <- top5_fromsoftware %>%
+  select(name, release_date, metacritic_score, proportion_avis_positif, total) %>%
+  mutate (proportion_avis_positif = proportion_avis_positif * 100) %>%
+  rename(
+    Jeu = name,
+    `Date de sortie` = release_date,
+    `Note Metacritic` = metacritic_score,
+    `Proportion d'avis positif Steam` = proportion_avis_positif,
+    `Nombre d'avis total` = total
+  )
+
+kable(top5_fromsoftware,
+      caption = "Notes des jeux FromSoftware Inc.", digits = 2)
+```
+
+### 🔎 Observations
+
+- On note que les notes les plus élevées ont été obtenus par les jeux de **Supergiant Games**, le studio de jeux indépendant qui ne possède pas le budget des deux autres studios.
+
+- Cependant, cela reste à nuancer : le nombre total de note est nettement moins élevé pour les jeux de Supergiant Games comparé aux jeux des deux studios.
+
+- On ne peut pas conclure facilement que les jeux d'un studio indie reconnu obtiennent de meilleures notes que les studios AAA car les jeux de **FromSoftware Inc.** obtiennent des bonnes notes (environ 90% d'approbation sur les jeux les plus notés du studio).
 
 ### ------------------------------------------------------------------------
 
