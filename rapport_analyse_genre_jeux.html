@@ -421,9 +421,8 @@ les jeux sortis en 2024</p>
 tag_players &lt;- tags %&gt;% 
   semi_join(games_2024, by = &quot;app_id&quot;) %&gt;%
   left_join(steamspy %&gt;% 
-              select(app_id, concurrent_users_yesterday),
-            by = &quot;app_id&quot;) %&gt;%
-  group_by(tag) %&gt;% 
+              select(app_id, concurrent_users_yesterday), by = &quot;app_id&quot;) %&gt;%
+              group_by(tag) %&gt;% 
   summarise(total_ccu = sum(concurrent_users_yesterday, na.rm = TRUE), .groups = &quot;drop&quot;) %&gt;%
   arrange(desc(total_ccu)) %&gt;% 
   slice_head(n = 10)

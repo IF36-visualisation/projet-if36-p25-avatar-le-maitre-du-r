@@ -60,9 +60,8 @@ games_2024 <- games %>%
 tag_players <- tags %>% 
   semi_join(games_2024, by = "app_id") %>%
   left_join(steamspy %>% 
-              select(app_id, concurrent_users_yesterday),
-            by = "app_id") %>%
-  group_by(tag) %>% 
+              select(app_id, concurrent_users_yesterday), by = "app_id") %>%
+              group_by(tag) %>% 
   summarise(total_ccu = sum(concurrent_users_yesterday, na.rm = TRUE), .groups = "drop") %>%
   arrange(desc(total_ccu)) %>% 
   slice_head(n = 10)
