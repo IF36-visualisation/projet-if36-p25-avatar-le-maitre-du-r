@@ -1065,6 +1065,39 @@ kable(top5_fromsoftware,
 
 
 ## Tendance des jeux sortis récemments (Jules PERRIN)
+# Contexte général
+Steam est une plateforme qui propose l'un des plus gros catalogue de jeux vidéo du marché. Chaque jeu proposé a plusieurs caractéristiques (nom, prix, éditeur , etc). Parmi ces caractéristiques, l'une d'entre elle nous intéresse particulièrement dans ce rapport. En effet les tags permettent aux joueurs de se faire une idée rapide des jeux proposés ou encore de rechercher de nouveaux jeux selon leur préférences.
+
+Le jeu de données que nous allons utiliser ne comporte pas de données permettant de dresser une temporalité. Ce rapport portera donc sur les données du catalogue Steam en octobre 2024.
+
+Les catégories ne doivent pas être confondues avec les tags. Ici les catégories représentent comment l'on joue au jeu (multiplayer, online pvp, remote play on phone etc). Alors que les tags représentent à quoi l'on joue (survival, tactical, FPS, old school, etc). 
+
+# Problématique
+
+Ce rapport traitera une question pour le moment: 
+
+ - Quelle est la tendance des jeux sortis récemment ?
+ 
+Cela nous permettra d'avoir une idée globale de la dispersion des joueurs dans les catégories majeurs sur steam pour les nouveaux jeux. Pourrait être utile à un studio pour orienter son futur jeux vidéo par example. 
+ 
+# Analyse
+## Import des données
+
+Premièrement il faut importer les données nécessaires à cette analyse.
+Ainsi que charger les librairies requises pour travailler et visualiser les données
+Les données des fichiers tags, steamspy et games sont nécéssaires
+
+```{r importe, message=FALSE, warning=FALSE}
+library(tidyr)
+library(scales)
+library(lubridate)
+library(ggplot2)
+library(tidyverse)
+
+steamspy <- read_csv("data/steamspy.csv")
+tags <- read_csv("data/tags.csv")
+games <- read_delim("data/clean_games.csv", delim=";", show_col_types = FALSE)
+```
 
 ### Précision et définition
 
@@ -1129,3 +1162,192 @@ Il faut absolument garder en tête que le dataset ne se base pas sur tout l'hist
 Les résultat présents sont limités par le fait que beaucoup de jeux peuvent avoir plusieurs tags et donc compter plusieurs fois et biaiser les résultat. Ici impossible de faire la distcntion car il n'y a pas de hiérarchisation des tags. Néamoins une possibilité pourrait être de donner un poids aà certains tags trop générique pour observer des résultat plus axé sur le theme du jeux en lui même (military plutot que multiplayer)
 
 Nous sommes également limité par l'explicité des tags, par exemple, Coop online est-il réservé au jeux qui proposent un matchmaking ou aux jeux permettant d'invité ses amis ou les deux. Ces petites imprécision affecte également la pertinence de l'analyse.
+
+
+
+
+```{r}
+#caté les plus populaires sur steam
+# Nécessite les packages suivants :
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(ggplot2)
+
+
+library(scales)
+# Jointure des catégories et données de popularité
+cat_pop <- left_join(steamspy, categories, by = "app_id")
+
+# Calcul de la borne minimale d'owners pour chaque catégorie
+cat_pop_long <- cat_pop %>%
+  filter(!is.na(categories) & !is.na(owners_range)) %>%
+  separate_rows(categories, sep = ",") %>%
+  mutate(
+    owner_min = as.numeric(str_replace_all(str_extract(owners_range, "^[0-9,]+"), ",", ""))
+  ) %>%
+  group_by(categories) %>%
+  summarise(
+    total_owner_min = sum(owner_min, na.rm = TRUE),
+    n = n()
+  ) %>%
+  arrange(desc(total_owner_min))
+
+# Sélection des 50 catégories les plus populaires
+top50_cat <- cat_pop_long %>% slice_max(total_owner_min, n = 50)
+
+# Affichage du graphique avec catégories en abscisse
+ggplot(top50_cat, aes(x = reorder(categories, total_owner_min), y = total_owner_min)) +
+  geom_col(width = 0.3, fill = "blue") +
+  labs(
+    title = "Top 50 des catégories Steam par nombre minimal de possesseurs",
+    x = "Catégorie",
+    y = "Somme des bornes minimales de possesseurs"
+  ) +
+  scale_y_continuous(labels = comma) +  # <--- C'est cette ligne qui enlève les exposants
+  theme_minimal(base_size = 10) +
+  theme(
+    axis.text.x = element_text(angle = 75, hjust = 1, size = 7),
+    plot.title = element_text(size = 13, face = "bold"),
+    axis.title.x = element_text(size = 10),
+    axis.title.y = element_text(size = 10)
+  )
+
+
+```
+
+
+
+
+
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+
+# On suppose que 'tags' contient app_id et tag (un tag par ligne)
+# Et que 'clean_games' contient release_date (format AAAA-MM-JJ) et app_id
+
+# Joindre les tags et les dates de sortie
+games_tags <- left_join(tags, clean_games %>% select(app_id, release_date), by = "app_id") %>%
+  filter(!is.na(tag), !is.na(release_date)) %>%
+  mutate(year = year(ymd(release_date)))
+
+# Compter le nombre de jeux par tag et par année
+genre_year <- games_tags %>%
+  group_by(year, tag) %>%
+  summarise(n = n(), .groups = "drop")
+
+# Choisir les 6 tags les plus fréquents (pour la lisibilité du graphique)
+top_tags <- genre_year %>%
+  group_by(tag) %>%
+  summarise(total = sum(n)) %>%
+  arrange(desc(total)) %>%
+  slice_head(n = 10) %>%
+  pull(tag)
+
+genre_year_top <- genre_year %>% filter(tag %in% top_tags)
+
+# Graphique d'évolution des principaux genres/tags
+ggplot(genre_year_top, aes(x = year, y = n, color = tag)) +
+  geom_line(linewidth = 1.1) +        # <-- utilise linewidth
+  geom_point(size = 1.6) +
+  labs(
+    title = "Évolution du nombre de jeux sortis par genre/tag (top 6)",
+    x = "Année de sortie",
+    y = "Nombre de jeux sortis",
+    color = "Tag"
+  ) +
+  theme_minimal(base_size = 10)
+
+
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+
+# Préparation des données de base
+games_tags <- left_join(tags, clean_games %>% select(app_id, release_date), by = "app_id") %>%
+  filter(!is.na(tag), !is.na(release_date)) %>%
+  mutate(year = year(ymd(release_date)))
+
+## 1. Global : tous les jeux (top 10 tags)
+genre_year_all <- games_tags %>%
+  group_by(year, tag) %>%
+  summarise(n = n(), .groups = "drop")
+top_tags_all <- genre_year_all %>%
+  group_by(tag) %>%
+  summarise(total = sum(n)) %>%
+  arrange(desc(total)) %>%
+  slice_head(n = 10) %>%
+  pull(tag)
+genre_year_all_top <- genre_year_all %>% filter(tag %in% top_tags_all)
+
+# Graphique global
+ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 1.6) +
+  labs(
+    title = "Évolution du nombre de jeux sortis par tag (tous jeux, top 10 tags)",
+    x = "Année de sortie",
+    y = "Nombre de jeux sortis",
+    color = "Tag"
+  ) +
+  theme_minimal(base_size = 10)
+
+## 2. Jeux sortis avant ou en 2015 (top 10 tags)
+games_tags_pre2015 <- games_tags %>% filter(year <= 2013) %>% filter(year > 2005)
+genre_year_pre2015 <- games_tags_pre2015 %>%
+  group_by(year, tag) %>%
+  summarise(n = n(), .groups = "drop")
+top_tags_pre2015 <- genre_year_pre2015 %>%
+  group_by(tag) %>%
+  summarise(total = sum(n)) %>%
+  arrange(desc(total)) %>%
+  slice_head(n = 10) %>%
+  pull(tag)
+genre_year_pre2015_top <- genre_year_pre2015 %>% filter(tag %in% top_tags_pre2015)
+
+# Graphique avant 2015
+ggplot(genre_year_pre2015_top, aes(x = year, y = n, color = tag)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 1.6) +
+  labs(
+    title = "Évolution des tags pour les jeux sortis avant ou en 2015 (top 10 tags)",
+    x = "Année de sortie",
+    y = "Nombre de jeux sortis",
+    color = "Tag"
+  ) +
+  theme_minimal(base_size = 10)
+
+## 3. Jeux sortis après 2015 (top 10 tags)
+games_tags_post2015 <- games_tags %>% filter(year > 2013)
+genre_year_post2015 <- games_tags_post2015 %>%
+  group_by(year, tag) %>%
+  summarise(n = n(), .groups = "drop")
+top_tags_post2015 <- genre_year_post2015 %>%
+  group_by(tag) %>%
+  summarise(total = sum(n)) %>%
+  arrange(desc(total)) %>%
+  slice_head(n = 10) %>%
+  pull(tag)
+genre_year_post2015_top <- genre_year_post2015 %>% filter(tag %in% top_tags_post2015)
+
+# Graphique après 2015
+ggplot(genre_year_post2015_top, aes(x = year, y = n, color = tag)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 1.6) +
+  labs(
+    title = "Évolution des tags pour les jeux sortis après 2015 (top 10 tags)",
+    x = "Année de sortie",
+    y = "Nombre de jeux sortis",
+    color = "Tag"
+  ) +
+  theme_minimal(base_size = 10)
+
+
+```
