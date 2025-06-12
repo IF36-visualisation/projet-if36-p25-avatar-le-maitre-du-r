@@ -15,14 +15,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-### Membres du groupe
+# Introduction
 
--   Hoang-Viêt LE
--   Paul LASSASSEIGNE
--   Jules PERRIN
--   Florian LOPITAUX
-
-# Steam
+### Steam
 
 Steam est une plateforme de distribution de jeux vidéo développée par Valve.
 
@@ -30,13 +25,15 @@ Elle permet aux utilisateurs d’acheter, télécharger et jouer à une grande v
 
 ![](img/store_home_share.jpg)
 
+---
+
 # Données
 
 Dans le cadre de notre projet, nous avons choisi d'étudier divers jeux de données autour du catalogue de jeux Steam. Les datasets utilisés lors de ce projet sont les suivants :
 
 - [Dataset de NewbieIndieGameDev datant d'Octobre 2024](https://github.com/NewbieIndieGameDev/steam-insights) (140 000 jeux recensés)
 
-Les datasets sont sous format de différents fichiers csv. Cependant, NewbieIndieGameDev utilisant probablement un logiciel tiers pour manipuler ses données, certains csv sont mal formatés et imparsables par un programme (données json dans une colonne, balises html, ...). <br> Nous devons donc les modifier au préalable. Nous avons déjà "reformaté" le fichier **games.csv** afin de le rendre lisible par nos programmes et vérifier que nous sommes bien capables de les traiter pour notre projet. <br> Ainsi dans le dossier data : pour chaque fichier qui possède ce problème, il y aura un fichier **raw\_**<nom_du_fichier>.csv qui sont les données brutes ("illisibles") et **clean\_**<nom_du_fichier>.csv qui sont les données reformatées pour qu'elles soient "lisibles".
+Les datasets sont sous format de différents fichiers csv. Cependant, NewbieIndieGameDev utilisant probablement un logiciel tiers pour manipuler ses données, certains csv sont mal formatés et imparsables par un programme (données json dans une colonne, balises html, ...). <br> Nous devons donc les modifier au préalable. Nous avons déjà "reformaté" le fichier **games.csv** afin de le rendre lisible par nos programmes et vérifier que nous sommes bien capables de les traiter pour notre projet. <br> Ainsi dans le dossier data : pour chaque fichier qui possède ce problème, il y aura un fichier **raw\_**\<nom_du_fichier\>.csv qui sont les données brutes ("illisibles") et **clean\_**\<nom_du_fichier\>.csv qui sont les données reformatées pour qu'elles soient "lisibles".
 
 Ces datasets possèdent de nombreuses variables. Nous allons nous concentrer sur ceux qui nous semblent assez pertinentes à analyser. Description des fichiers et de leur contenu :
 
@@ -65,6 +62,8 @@ Ces datasets possèdent de nombreuses variables. Nous allons nous concentrer sur
 -   **`categories.csv`** : liste les catégories officielles Steam associées aux jeux.
     -   `app_id` (*discrètes*) : identifiant unique du jeu sur Steam
     -   `category` (*nominales*) : catégorie associée au jeu
+    
+---
 
 # Plan d'analyse
 
@@ -118,7 +117,7 @@ Voici une liste non exhaustive des variables comparées ainsi que les visualisat
 -   Pour certaines données notamment provenant de SteamSpy, ce sont des estimations donc les analyses sur ces données perdront une certaine précision
 
 
-## ------------------------------------------------------------------------
+---
 
 ```{r import}
 library(scales)
@@ -262,7 +261,7 @@ tableau_stat <- df_long %>%
 kable(tableau_stat, col.names = c("Variable", "Moyenne", "Ecart-Type"), caption = "Statistiques descriptives des principales variables", digits = 2)
 ```
 
-Notes :
+### Notes :
 
 - La moyenne des notes Metacritics ne concerne que les jeux ayant reçu cette note
 - La moyenne des prix ne concerne uniquement les jeux payants
@@ -345,13 +344,13 @@ ggplot(owners_count_clean, aes(x = nb_jeux, y = owners_range_short)) +
   coord_cartesian(clip = "off")
 ```
 
-Note :
+### Note :
 
 - Ces données proviennent de SteamSpy. Un autre outil existe pour estimer le nombre de copies vendues au total (Gamalytic), mais ce service est payant
 
 ### Répartition des jeux Steam sortis par année
 
-```{r game_released_by_year, results='markup'}
+```{r game_released_by_year, results='hide'}
 # Extraire l'année et compter les jeux par année
 jeux_par_annee <- steamData %>%
   mutate(annee_sortie = lubridate::year(release_date)) %>%
@@ -387,9 +386,9 @@ ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
     labels = comma_format()
   ) +
   labs(
-    title = "Nombre de jeux sortis par année (échelle pseudo-logarithmique)",
+    title = "Nombre de jeux sortis par année (échelle pseudo-log)",
     x = "Année de sortie",
-    y = "Nombre de jeux (pseudo-log scale)"
+    y = "Nombre de jeux (pseudo-log)"
   ) +
   theme_minimal() +
   theme(
@@ -398,12 +397,20 @@ ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
   )
 ```
 
-Notes : 
+### Observations :
 
-- On observe l'absence de jeux sortis en 2002 et une augmentation nette à partir de 2006.
-- Une explication plausible est que la plateforme Steam est sortie en 2003 et était dédiée à la distribution des mises à jour des jeux Valve. C'est qu'à la fin de l'année 2005 que Steam décide de distribuer des jeux tiers sur son marché.
+- On observe l'absence de jeux sortis en 2002.
+- On observe également **une augmentation nette** à partir de **2006**. Une explication plausible est que la plateforme Steam est sortie en 2003 et était dédiée à la distribution des mises à jour des jeux Valve. Ce n'est qu'à la fin de l'année 2005 que Steam a décidé de distribuer des jeux tiers sur son marché.
+- On observe une **augmentation brusque** en **2006**. Ceci est le résultat du programme **Steam Greenlight**, un service qui permettait aux développeurs de soumettre leur jeu pour que la communauté Steam puisse voter pour ceux qui vont intégrer le catalogue de la plateforme.
+Lancé en 2004, ce service va permettre à plus en plus de jeux de pouvoir intégrer le catalogue Steam.
 
-Source : [Lien Wikipédia de Steam](https://en.wikipedia.org/wiki/Steam_\(service\))
+
+### Sources des explications :
+
+- Lien vers l'histoire de Steam  : [Lien Wikipédia de Steam](https://en.wikipedia.org/wiki/Steam_\(service\))
+- Interview de Gabe Newell sur Steam Greenlight  : [Interview sur Steam Greenlight en 2006](https://www.gamedeveloper.com/business/for-gabe-newell-greenlight-is-just-a-stepping-stone-to-a-bigger-endgame)
+- Post Reddit sur l'histoire de Steam Greenlight : [Lien vers le post Reddit](https://www.reddit.com/r/HobbyDrama/comments/zwmzoh/video_gameshobby_history_the_glow_of_steam/)
+
 
 ### Répartition des genres des jeux Steam
 
@@ -436,7 +443,13 @@ genres_par_jeu %>%
   )
 ```
 
-Note :
+
+### Observations :
+
+- Le genre le plus populaire dans le catalogue Steam est le genre `Indie`
+- On peut observer ensuite un nombre similaire pour les genres `Action` `Casual` et `Adventure` (~ 36k jeux) et pour les genres `Simulation`, `Strategy` et `RPG` (~ 17k jeux)
+
+### Note :
 
 - Nous avons retiré les genres qui ne comptaient moins de 1000 jeux pour se concentrer sur les genres principaux des jeux Steam. La plupart des autres genres retirés étaient des genres de niche (Cinéma ou d'autres genres concernant les logiciels disponibles sur Steam).
 
@@ -521,18 +534,20 @@ ggplot(cor_long, aes(x = x, y = y)) +
   coord_fixed(ratio = 1)
 ```
 
-Avec cette matrice de corrélation, on peut noter les remarques suivantes :
+### Observations :
 
 - Le nombre d'avis positif semble être corrélé avec le nombre de recommendation (0.93)
 - La note Metacritic n'est pas forcément corrélé avec la proportion de notes positives (0.53)
 - Certaines valeurs obtenues doivent être discutées comme la corrélation entre le nombre de recommendation et le nombre d'avis positive/négative. En effet, comme il s'agit d'une valeur comptée, cela peut biaiser l'interprétation de la corrélation. En prenant en compte la proportion, nous obtenons une valeur quasi-nulle. 
 
-Notes :
+### Notes :
 
 - Il n'existe pas de corrélation négative dans nos données
 - Nous avons omis la proportion d'avis négative dans le tableau car nous obtenons juste le résultat inverse que pour la corrélation pour les avis positive.
 
-## ------------------------------------------------------------------------
+---
+
+# Analyse du dataset
 
 ### Partie Analyse Prix (Florian LOPITAUX)
 
