@@ -109,7 +109,13 @@ Avec ces nombreuses données et variables, de nombreuses pistes d'analyse sont p
 
 ## Variables à comparer/Visualisations à réaliser
 
-Voici une liste non exhaustive des variables comparées ainsi que les visualisations que l'on va réaliser : - Nombre de jeux par genre/catégorie, avec possibilité de filtrer par date de sortie pour analyser les tendances récentes. - Comparaison entre les scores Metacritic et les avis des utilisateurs sur Steam. - Corrélation entre le nombre de langues disponibles et le nombre de propriétaires d’un jeu. - Comparaison entre les jeux issus d’un studio indépendant et ceux d’un grand studio, en comparant l’évolution des ventes réalisées, le prix des jeux et les avis des joueurs (ex : les jeux du studio Supergiant Games vs Ubisoft). - Analyse des combinaisons de genres les plus fréquentes pour les jeux indépendants et les jeux AAA, afin de mettre en évidence des différences de positionnement. - Évolution des prix de lancement des jeux au fil du temps.
+Voici une liste non exhaustive des variables comparées ainsi que les visualisations que l'on va réaliser : 
+
+- Nombre de jeux par genre/catégorie, avec possibilité de filtrer par date de sortie pour analyser les tendances récentes. 
+- Comparaison entre les scores Metacritic et les avis des utilisateurs sur Steam. 
+- Corrélation entre le nombre de langues disponibles et le nombre de propriétaires d’un jeu. 
+- Comparaison entre les jeux issus d’un studio indépendant et ceux d’un grand studio, en comparant l’évolution des ventes réalisées, le prix des jeux et les avis des joueurs (ex : les jeux du studio Supergiant Games vs Ubisoft). 
+- Analyse des combinaisons de genres les plus fréquentes pour les jeux indépendants et les jeux AAA, afin de mettre en évidence des différences de positionnement. - Évolution des prix de lancement des jeux au fil du temps.
 
 ## Problèmes et limitations
 
@@ -669,9 +675,9 @@ Notre hypothèse concernant les moyens et coûts de traduction qui pourraient im
 ### ------------------------------------------------------------------------
 
 
-## 🕹️ Types de jeux en ligne sur Steam (Hoang-Viêt LE)
+##  Types de jeux en ligne sur Steam (Hoang-Viêt LE)
 
-### 🔍 Différences entre Catégorie et Tag
+### Différences entre Catégorie et Tag
 
 Sur Steam, il existe deux types de variables qui permettent de classer les jeux présents sur la plateforme :
 
@@ -683,7 +689,7 @@ Exemples : `Puzzle`, `Narratif`, `Indépendant`, `FPS`, `Monde ouvert`.
 
 ![Tags et Catégories de Portal 2 sur Steam](img/portal_tag_categories.png){width=50%}
 
-### 📌 Contexte et problématique
+### Contexte et problématique
 
 Steam est un acteur majeur dans le développement du jeu en ligne avec des titres cultes comme Counter-Strike ou Team Fortress. Au fil des années, d'autres genres comme les MMORPG, Battle Royale ou les jeux en coopération ont gagné en popularité.
 Nous voulons voir les tendances actuelles et quels types de jeux attirent principalement les joueurs de Steam.
@@ -704,7 +710,7 @@ Typologies principales :
 - `Jeux compétitifs` (FPS, MOBA, Battle Royale)
 - `Jeux collaboratifs` (ex : Euro Truck Simulator 2)
 
-### ✅ Critères d'identification "jeu en ligne" :
+### Critères d'identification "jeu en ligne" :
 
 **_Pour qu’un jeu soit considéré comme en ligne :_**
 
@@ -715,17 +721,17 @@ Il doit contenir au moins un des éléments suivants dans ses catégories ou tag
 **_Pour mesurer la popularité :_**
 On utilise le nombre de joueurs actifs en octobre 2024 (`concurrent_users_yesterday` dans les données).
 
-### 🧩 Types de jeux en ligne
+### Types de jeux en ligne
 
 Pour analyser les type de jeux les plus populaires pour les jeux en ligne et regarder sa distribution dans le magasin Steam, on a retenu les tags suivants uniquement :
 
--   **FPS Multijoueur**
--   **Battle Royale**
--   **RPG en ligne**
--   **Coopération en ligne**
--   **Sandbox**
--   **Survival Multiplayer**
--   **Autres** (correspondant aux autres tags non classés)
+-   FPS Multijoueur
+-   Battle Royale
+-   RPG en ligne
+-   Coopération en ligne
+-   Sandbox
+-   Survival Multiplayer
+-   Autres (correspondant aux autres tags non classés)
 
 ```{r get_infos_online_games, include=FALSE}
 # Détecter les jeux multijoueurs
@@ -762,7 +768,7 @@ popularite_types <- jeux_en_ligne_type %>%
 
 ```
 
-### 📊 Analyse des résultats
+### Analyse des résultats
 
 Voici la répartition des joueurs sur la plateforme Steam sur les jeux en lignes :
 
@@ -780,26 +786,18 @@ ggplot(popularite_types, aes(x = reorder(type_de_jeu, total_joueurs_actifs), y =
        y = "Nombre de joueurs actifs (Octobre 2024)")
 ```
 
-### 🔎 Observations
+### Observations
 
-- 🥇 **FPS Multijoueur** est de loin le genre dominant avec 1,5 million de joueurs actifs, dont 1,1 million sur Counter-Strike 2 à lui seul.
-
+- Les jeux **FPS Multijoueur** est de loin le genre dominant avec 1,5 million de joueurs actifs, dont 1,1 million sur Counter-Strike 2 à lui seul.
 - **Autres genres** comptent 1,3 million de joueurs avec des jeux variés comme War Thunder, Euro Truck 2, Civilization VI, etc. Cette catégorie montre la diversité des jeux en ligne.
-
-- 🥉 **Battle Royale** regroupe 1 million de joueurs (~16,5 %). Bien qu’en déclin par rapport à 2018-2020, ce genre reste populaire.
-
-- **RPG en ligne** : environ 1,2 million de joueurs. On y trouve :
-
+- Les **Battle Royale** regroupe 1 million de joueurs (~16,5 %). Bien qu’en déclin par rapport à 2018-2020, ce genre reste populaire.
+- Les **RPG en ligne** regroupent environ 1,2 million de joueurs. On y trouve :
   - Des MMORPG (Destiny 2, New World, etc.)
-
   - Des RPG coopératifs (Baldur’s Gate 3, Stardew Valley)
+- Les **Survival Multijoueur** comptent 800 000 joueurs sur des titres comme Rust, Satisfactory, Factorio.
+- Les **MOBA** n'ont seulement 550 000 joueurs, dont la grande majorité provient de Dota 2.
 
-- **Survival Multijoueur** : 800 000 joueurs sur des titres comme Rust, Satisfactory, Factorio.
-
-- **MOBA** : seulement 550 000 joueurs, dont la grande majorité provient de Dota 2.
-
-
-### 🎯 Les RPG en détails
+### Les RPG en détails
 
 Nous allons approfondir notre analyse dans le type **RPG** en essayant de séparer et de voir la répartition des RPG en ligne et des MMORPG.
 
@@ -850,7 +848,7 @@ Note :
 
 - Stardew Valley a le tag RPG et est un jeu qui peut se jouer en multijoueur mais peut-on considérer comme un jeu en ligne ? C'est le cas d'autres jeux principalement singleplayer mais qui peut se jouer en multijoueur.
 
-### ⚠️ Limites de résultats obtenus
+### Limites de résultats obtenus
 
 -   Les **tags Steam** et les **catégories** créées ne sont **pas assez précises** pour trouver les jeux en ligne car on se retrouve souvent à la frontière d'un jeu avec un système multijoueur et un jeu en ligne.
 
@@ -860,9 +858,99 @@ Note :
 
 -   Enfin, il faut être conscient que ces données ne concernent que les utilisateurs Steam et non la globalité des joueurs. Par exemple, pour les MMORPG, ceux-ci peuvent être lancés hors Steam. De plus avec l'avènement de l'Epic Game Store, une partie des jeux sont passés sur l'autre plateforme comme Rocket League.
 
+## Les jeux les plus populaires
 
-### ------------------------------------------------------------------------
+Dans cette partie, nous allons observer les jeux avec le plus de joueurs jouant en même temps. Voici les données pour le dataset que l'on a qui indique le nombre de joueurs en Octobre 2024 :
 
+```{r popular_game_chart, results='markup'}
+jeux_populaires <- steamData %>%
+  # Enlever Wallpaper Engine car ce n'est pas un jeu...
+  filter(name != 'Wallpaper Engine') %>%
+  # Sélectionner les 10 premiers jeux
+  arrange(desc(concurrent_users_yesterday)) %>%
+  slice_head(n = 10)
+
+ggplot(jeux_populaires, aes(x = reorder(name, concurrent_users_yesterday), y = concurrent_users_yesterday)) +
+  geom_col(fill = "#1A9FFF", show.legend = FALSE) +
+  coord_flip() +
+  theme_minimal() +
+  theme(
+  plot.margin = unit(c(0.5, 2.5, 0.5, 0.5), "cm")  # top, right, bottom, left
+  ) +
+  # Labels à l'intérieur des barres pour les grandes valeurs (>= 100)
+  geom_text(
+    data = jeux_populaires %>% filter(concurrent_users_yesterday >= 150000),
+    aes(x = name, label = label_number(big.mark = " ")(concurrent_users_yesterday)),
+    hjust = 1.2, color = "#002244", size = 3.5
+  ) +
+  # Labels à l'extérieur à droite pour les petites valeurs (< 100)
+  geom_text(
+    data = jeux_populaires %>% filter(concurrent_users_yesterday < 150000),
+    aes(x = name, label = label_number(big.mark = " ")(concurrent_users_yesterday)),
+    hjust = -0.2, color = "#002244", size = 3.5
+  ) +
+  
+  labs(title = "Les jeux les plus populaires de Steam (Oct. 24)",
+       x = element_blank(),
+       y = "Nombre de joueurs actifs en simultané")
+
+```
+
+Pour les données plus récentes, nous avons récolté le nombre de joueurs actif sur le site [SteamDB](https://steamdb.info/charts/). Voici le même graphique pour Juin 2025 :
+
+```{r popular_game_june_2025_chart, results='markup'}
+jeux_populaires_2025 <- read.csv("data/popular_games_june_2025.csv", sep = ";") %>%
+    # Sélectionner les 10 premiers jeux
+  arrange(desc(concurrent_users_yesterday)) %>%
+  slice_head(n = 10)
+
+ggplot(jeux_populaires_2025, aes(x = reorder(name, concurrent_users_yesterday), y = concurrent_users_yesterday)) +
+  geom_col(fill = "#1A9FFF", show.legend = FALSE) +
+  coord_flip() +
+  theme_minimal() +
+  theme(
+  plot.margin = unit(c(0.5, 2.5, 0.5, 0.5), "cm")  # top, right, bottom, left
+  ) +
+  # Labels à l'intérieur des barres pour les grandes valeurs (>= 100)
+  geom_text(
+    data = jeux_populaires_2025 %>% filter(concurrent_users_yesterday >= 220000),
+    aes(x = name, label = label_number(big.mark = " ")(concurrent_users_yesterday)),
+    hjust = 1.2, color = "#002244", size = 3.5
+  ) +
+  # Labels à l'extérieur à droite pour les petites valeurs (< 100)
+  geom_text(
+    data = jeux_populaires_2025 %>% filter(concurrent_users_yesterday < 220000),
+    aes(x = name, label = label_number(big.mark = " ")(concurrent_users_yesterday)),
+    hjust = -0.2, color = "#002244", size = 3.5
+  ) +
+  
+  labs(title = "Les jeux les plus populaires de Steam (Jun. 25)",
+       x = element_blank(),
+       y = "Nombre de joueurs actifs en simultané")
+```
+
+### Observations :
+
+- Il existe 3 jeux principaux qui regroupe la majorité des utilisateurs Steam : **Counter-Strike 2**, **PUBG** et **Dota 2** avec plus de 500k joueurs.
+- On peut remarquer une augmentation significative de la base de joueurs de ces 3 jeux entre octobre 2024 et juin 2025, notamment Counter-Strike 2 qui compte 400k joueurs supplémentaire d'après nos données mais il est de 200k en réalité ([SteamDB - Page CS2](https://steamdb.info/app/730/charts/#1y))
+- Certains jeux comme **Black Myth: Wukong** ou **Liar's Bar** ont été sorti en octobre 2024, ce qui peut expliquer leur présence dans les jeux les plus populaires de Steam et leur absence dans le second graphique. La même remarque est à réaliser pour les nouveaux jeux sortis en juin 2025 comme **Stellar Blade**, **Dune: Awakening** ou **ELDEN RING NIGHTREIGN** qui viennent juste de sortir
+- La présence de `Free-to-play` peut aussi expliquer la présence de **Bongo Cat** et de **Delta Force** dans le graphique de juin 2025. On note 5 jeux FTP dans le classement de 2025.
+- En juin 2025, bien qu'ils ne fassent pas parti des 10 jeux les plus populaires, **NARAKA: BLADEPOINT** (12ème) et **Stardew Valley** (19ème) possèdent une base de joueurs assez fidèle. **Rust**, quant à lui, reste dans le classement à la 10ème place.
+- Pour **Stardew Valley**, on peut supposer que sa promotion (-50%) en octobre lui a permis de rentrer dans le classement des jeux les plus populaires.
+- Pour **Factorio**, la raison de sa présence en octobre est dû à la sortie de son contenu additionnel `Factorio: Space Age` sortie en octobre 2024
+- Pour **Liar's Bar**, le jeu a été assez populaire en raison de nombreux streamers/youtubers qui ont réalisé du contenu sur le jeu.
+
+### Conclusion
+
+On peut observer plusieurs caractéristiques communes des jeux les plus populaires sur Steam :
+- Les jeux sont `Free-to-play`
+- Les sorties récentes de jeux ou de contenus additionnels
+- Les soldes du jeu
+- Le jeu devienne le contenu tendance des créateurs de contenu (streamers/youtubers)
+
+Le classement des jeux les populaires est assez versatile mais le top 3 reste identique avec leurs grosses bases de joueurs.
+
+---
 
 ## Analyse des notes des jeux AAA et indies (Paul Lassasseigne)
 
@@ -892,7 +980,7 @@ Afin de réaliser l'analyse, on va utiliser les fichiers [raw_reviews.csv](https
 
 Steam possède un tag spécialement pour les jeux indépendants, qui se nomme "Indie". Ce n'est pas le cas pour les jeux AAA. Cependant, on peut facilement les obtenir en récupérant l'ensemble des jeux, puis en enlevant les jeux indépendants :
 
-```{r}
+```{r indie_aaa}
 indie_games <- tags %>%
   mutate(app_id = as.character(app_id)) %>%
   filter(tag == "Indie") %>%
@@ -952,7 +1040,7 @@ Le problème est que ce n'est pas égal de faire la comparaison actuellement. Co
 
 La fonction geom_bar nous permet de définir l'option "position = dodge" afin d'avoir les barres côte à côte pour une meilleure lisibilité.
 
-```{r}
+```{r Evaluation Indie/AAA chart}
 evaluations %>%
   mutate(review_score_description = factor(review_score_description, levels = c("Very Negative", "Mostly Negative", "Mixed", "Mostly Positive", "Very Positive", "Overwhelmingly Positive"))) %>%
   count(review_score_description, type_game) %>%
@@ -979,8 +1067,7 @@ L'analyse du graphique montre que, proportionnellement, les jeux AAA obtiennent 
 
 Cette hypothèse vient du fait que aujourd'hui, les joueurs sont focalisés sur un léger pourcentage de jeux par rapport à l'entièreté du monde du jeu vidéo. Tous les jours de nouveaux jeux sortent, tous les jours il peut y en avoir d'excellents, mais ils ne feront pas le même bruit que les jeux colossaux développés par les grandes entreprises, comme Microsoft, Ubisoft, Activision Blizzard, Rockstar etc...
 
-
-### 🔎 Focus sur différents studios de jeux
+### Focus sur différents studios de jeux
 
 Dans cette section, nous nous intéressons à trois studios aux profils très différents afin de comparer les jeux qu’ils produisent, notamment en termes de notes et réception critique :
 
@@ -989,11 +1076,12 @@ Dans cette section, nous nous intéressons à trois studios aux profils très di
 - **FromSoftware Inc.** : un studio produisant des jeux AAA mais dans un registre différent qu'Ubisoft
 
 L'objectif de cette partie est de regarder les notes des différents jeux des studios avec leurs approches différentes en terme de production de jeux vidéos et d'explorer davantage la question de la notation et de la potentiel influence du tag `indie`.
+
 Nous allons prendre les 5 jeux de chaque studio ayant obtenu le plus de notes sur Steam.
 
 ### Notes obtenus
 
-```{r Ubisoft vs Supergiant, results='markup'}
+```{r Ubisoft vs Supergiant vs FromSoftware, results='markup'}
 # Obtenir les jeux des studios
 ubisoft_games <- steamData %>%
   filter(str_detect(tolower(developer), "ubisoft")) %>%
@@ -1070,16 +1158,87 @@ kable(top5_fromsoftware,
       caption = "Notes des jeux FromSoftware Inc.", digits = 2)
 ```
 
-### 🔎 Observations
+### Observations
 
 - On note que les notes les plus élevées ont été obtenus par les jeux de **Supergiant Games**, le studio de jeux indépendant qui ne possède pas le budget des deux autres studios.
-
 - Cependant, cela reste à nuancer : le nombre total de note est nettement moins élevé pour les jeux de Supergiant Games comparé aux jeux des deux studios.
-
 - On ne peut pas conclure facilement que les jeux d'un studio indie reconnu obtiennent de meilleures notes que les studios AAA car les jeux de **FromSoftware Inc.** obtiennent des bonnes notes (environ 90% d'approbation sur les jeux les plus notés du studio).
 
-### ------------------------------------------------------------------------
+### Les genres des jeux Indies sont-elles plus innovantes ?
 
+```{r Genres des jeux Indie}
+indie_games_genres <- steamData %>% 
+  filter(str_detect(genres, "Indie"))
+
+indie_games_tags <- steamData %>% 
+  filter(str_detect(tags, "indie"))
+
+indie_games = indie_games_genres %>% left_join(indie_games_tags)
+
+non_indie_games <- steamData %>%
+  anti_join(indie_games) %>%
+  filter(type == "game") %>%
+  filter(owners_range != "0 .. 20,000")
+
+indie_combinations <- indie_games %>%
+  count(genres, sort = TRUE) %>%
+  mutate(genres = if_else(
+    genres == "Indie",
+    genres,  # on garde tel quel si c'est uniquement "Indie"
+    str_remove_all(genres, "\\bIndie\\b,?\\s*") %>%
+      str_remove_all(",\\s*$") %>%
+      str_trim()
+  )) %>%
+  slice_max(n, n = 10)
+
+non_indie_combinations <- non_indie_games %>%
+  count(genres, sort = TRUE) %>%
+  slice_max(n, n = 10)
+
+```
+
+Nous allons nous intéresser aux genres des jeux indépendant pour voir s'il existe des combinaisons de genres différentes comparé aux jeux AAA. 
+
+Tout d'abord, on extrait les genres des jeux AAA. Nous obtenons cette répartition :
+
+```{r AAA genres combinaisons, results='markup'}
+ggplot(non_indie_combinations, aes(x = reorder(genres, n), y = n, fill = genres)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(title = "Combinaisons de genres les plus fréquentes",
+       x = "Combinaisons de genres",
+       y = "Nombre de jeux") +
+  theme_minimal()
+```
+
+### Observations :
+
+- Le genre le plus fréquent chez les jeux AAA sont les genres `Action`, `Aventure`, `Action/Aventure` et `Strategy`
+
+
+On extrait maintenant les genres des jeux indépendants :
+
+```{r Indie genres combinaisons, results='markup'}
+ggplot(indie_combinations, aes(x = reorder(genres, n), y = n, fill = genres)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(title = "Combinaisons de genres les plus fréquentes",
+       x = "Combinaisons de genres",
+       y = "Nombre de jeux") +
+  theme_minimal()
+```
+
+### Obesrvations :
+
+- Le genre `Casual` est majoritaire dans les jeux indies, suivi de près par le genre `Action`
+- Il y a plus de multi-genres dans les jeux indies que sur les AAA
+- La plupart des genres des jeux indies contiennent le genre `Casual` combiné avec un autre genre ou tout seul
+
+### Conclusion
+
+Les jeux indies ne possèdent pas la même tendance de genres que les jeux AAA. Ces jeux possèdent généralement le genre `Casual` et sont souvent en multi-genre. Nous ne pouvons pas conclure sur une certaine innovation des genres des jeux indies car mise à part le genre `Casual` nettement présent, le genre `Action` et `Adventure` sont majoritaires dans les deux catégories de jeux.
+
+---
 
 ## Tendance des jeux sortis récemments (Jules PERRIN)
 # Contexte général
@@ -1179,9 +1338,6 @@ Il faut absolument garder en tête que le dataset ne se base pas sur tout l'hist
 Les résultat présents sont limités par le fait que beaucoup de jeux peuvent avoir plusieurs tags et donc compter plusieurs fois et biaiser les résultat. Ici impossible de faire la distcntion car il n'y a pas de hiérarchisation des tags. Néamoins une possibilité pourrait être de donner un poids aà certains tags trop générique pour observer des résultat plus axé sur le theme du jeux en lui même (military plutot que multiplayer)
 
 Nous sommes également limité par l'explicité des tags, par exemple, Coop online est-il réservé au jeux qui proposent un matchmaking ou aux jeux permettant d'invité ses amis ou les deux. Ces petites imprécision affecte également la pertinence de l'analyse.
-
-
-
 
 
 ```{r}
@@ -1475,6 +1631,11 @@ ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
     color = "Tag"
   ) +
   theme_minimal(base_size = 10)
+
+```
+
+
+```{r}
 
 ```
 
