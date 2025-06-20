@@ -220,7 +220,7 @@ Enfin, nous construirons également une matrice de corrélation afin d'examiner 
 
 ## Moyennes et Écarts-types
 
-```{r mean_and_sd, results='markup'}
+```{r mean_and_sd}
 # Variables pertinents pour la moyenne et l'écart-type
 steamSummarise = steamData %>%
   summarise(
@@ -276,7 +276,7 @@ kable(tableau_stat, col.names = c("Variable", "Moyenne", "Ecart-Type"), caption 
 
 ### Répartition de la plage de propriétaires des jeux Steam
 
-```{r owner_count_repartition, results='markup'}
+```{r owner_count_repartition}
 # Compter le nombre de jeux par plage de propriétaires
 owners_count <- steamData %>%
   group_by(owners_range) %>%
@@ -355,8 +355,7 @@ ggplot(owners_count_clean, aes(x = nb_jeux, y = owners_range_short)) +
 - Ces données proviennent de SteamSpy. Un autre outil existe pour estimer le nombre de copies vendues au total (Gamalytic), mais ce service est payant
 
 ### Répartition des jeux Steam sortis par année
-
-```{r game_released_by_year, results='hide'}
+```{r jeux_par_annee}
 # Extraire l'année et compter les jeux par année
 jeux_par_annee <- steamData %>%
   mutate(annee_sortie = lubridate::year(release_date)) %>%
@@ -364,25 +363,10 @@ jeux_par_annee <- steamData %>%
   group_by(annee_sortie) %>%
   summarise(nb_jeux = n()) %>%
   arrange(annee_sortie)
-
-ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
-  geom_col(fill = "#2C7FB8") +
-  scale_x_continuous(breaks = pretty(jeux_par_annee$annee_sortie, n = 10)) +
-  scale_y_continuous(labels = scales::comma) +
-  labs(
-    title = "Nombre de jeux sortis par année",
-    x = "Année de sortie",
-    y = "Nombre de jeux"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.title = element_text(size = 12)
-  )
 ```
 
-```{r game_released_by_year_log, results='markup'}
 
+```{r game_released_by_year_log}
 ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
   geom_col(fill = "#2C7FB8") +
   scale_x_continuous(breaks = pretty(jeux_par_annee$annee_sortie, n = 10)) +
@@ -407,20 +391,38 @@ ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
 
 - On observe l'absence de jeux sortis en 2002.
 - On observe également **une augmentation nette** à partir de **2006**. Une explication plausible est que la plateforme Steam est sortie en 2003 et était dédiée à la distribution des mises à jour des jeux Valve. Ce n'est qu'à la fin de l'année 2005 que Steam a décidé de distribuer des jeux tiers sur son marché.
-- On observe une **augmentation brusque** en **2006**. Ceci est le résultat du programme **Steam Greenlight**, un service qui permettait aux développeurs de soumettre leur jeu pour que la communauté Steam puisse voter pour ceux qui vont intégrer le catalogue de la plateforme.
-Lancé en 2004, ce service va permettre à plus en plus de jeux de pouvoir intégrer le catalogue Steam.
+- On observe une **augmentation brusque** en **2013-2014**. Ceci est le résultat du programme **Steam Greenlight**, un service qui permettait aux développeurs de soumettre leur jeu pour que la communauté Steam puisse voter pour ceux qui vont intégrer le catalogue de la plateforme.
+Lancé en 2012, ce service va permettre à plus en plus de jeux de pouvoir intégrer le catalogue Steam.
+- Il faut prendre en compte également que ce graphique utilise une échelle pseudo-logarithmique, lorsque l'on parlons d'augmentation nette, elle ne l'est pas réellement en terme de chiffre. On vous affiche le graphique réel sans échelle logarithmique :
+
+```{r game_released_by_year}
+ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
+  geom_col(fill = "#2C7FB8") +
+  scale_x_continuous(breaks = pretty(jeux_par_annee$annee_sortie, n = 10)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Nombre de jeux sortis par année",
+    x = "Année de sortie",
+    y = "Nombre de jeux"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12)
+  )
+```
 
 
 ### Sources des explications :
 
 - Lien vers l'histoire de Steam  : [Lien Wikipédia de Steam](https://en.wikipedia.org/wiki/Steam_\(service\))
-- Interview de Gabe Newell sur Steam Greenlight  : [Interview sur Steam Greenlight en 2006](https://www.gamedeveloper.com/business/for-gabe-newell-greenlight-is-just-a-stepping-stone-to-a-bigger-endgame)
+- Interview de Gabe Newell sur Steam Greenlight  : [Interview sur Steam Greenlight en 2013](https://www.gamedeveloper.com/business/for-gabe-newell-greenlight-is-just-a-stepping-stone-to-a-bigger-endgame)
 - Post Reddit sur l'histoire de Steam Greenlight : [Lien vers le post Reddit](https://www.reddit.com/r/HobbyDrama/comments/zwmzoh/video_gameshobby_history_the_glow_of_steam/)
 
 
 ### Répartition des genres des jeux Steam
 
-```{r genres, results='markup'}
+```{r genres}
 # Séparer les genres (s'ils sont séparés par des virgules), enlever les espaces, et compter
 genres_par_jeu <- steamData %>%
   filter(!is.na(genres)) %>%
@@ -461,7 +463,7 @@ genres_par_jeu %>%
 
 ## Matrice de corrélation
 
-```{r correlation_matrix, results='markup'}
+```{r correlation_matrix}
 # Matrice de corrélation
 numeric_cols <- steamData %>%
   select(
@@ -772,7 +774,7 @@ popularite_types <- jeux_en_ligne_type %>%
 
 Voici la répartition des joueurs sur la plateforme Steam sur les jeux en lignes :
 
-```{r barchart,  echo=FALSE, fig.align='center'}
+```{r barchart, fig.align='center'}
 ggplot(popularite_types, aes(x = reorder(type_de_jeu, total_joueurs_actifs), y = total_joueurs_actifs, fill = type_de_jeu)) +
   geom_col(show.legend = FALSE) +
   coord_flip() +
@@ -803,7 +805,7 @@ Nous allons approfondir notre analyse dans le type **RPG** en essayant de sépar
 
 Voici la répartition des joueurs jouant à des MMORPG et des joueurs de RPG classique :
 
-```{r mmo_vs_classicRPG, echo=FALSE, fig.align='center'}
+```{r mmo_vs_classicRPG, fig.align='center'}
 # Filtrer les jeux RPG en ligne et ajouter une colonne is_MMO
 mmo_vs_classicRPG <- jeux_en_ligne_type %>%
   filter(type_de_jeu == "RPG en ligne") %>%
@@ -862,7 +864,7 @@ Note :
 
 Dans cette partie, nous allons observer les jeux avec le plus de joueurs jouant en même temps. Voici les données pour le dataset que l'on a qui indique le nombre de joueurs en Octobre 2024 :
 
-```{r popular_game_chart, results='markup'}
+```{r popular_game_chart}
 jeux_populaires <- steamData %>%
   # Enlever Wallpaper Engine car ce n'est pas un jeu...
   filter(name != 'Wallpaper Engine') %>%
@@ -898,7 +900,7 @@ ggplot(jeux_populaires, aes(x = reorder(name, concurrent_users_yesterday), y = c
 
 Pour les données plus récentes, nous avons récolté le nombre de joueurs actif sur le site [SteamDB](https://steamdb.info/charts/). Voici le même graphique pour Juin 2025 :
 
-```{r popular_game_june_2025_chart, results='markup'}
+```{r popular_game_june_2025_chart}
 jeux_populaires_2025 <- read.csv("data/popular_games_june_2025.csv", sep = ";") %>%
     # Sélectionner les 10 premiers jeux
   arrange(desc(concurrent_users_yesterday)) %>%
@@ -1081,7 +1083,7 @@ Nous allons prendre les 5 jeux de chaque studio ayant obtenu le plus de notes su
 
 ### Notes obtenus
 
-```{r Ubisoft vs Supergiant vs FromSoftware, results='markup'}
+```{r Ubisoft vs Supergiant vs FromSoftware}
 # Obtenir les jeux des studios
 ubisoft_games <- steamData %>%
   filter(str_detect(tolower(developer), "ubisoft")) %>%
@@ -1201,7 +1203,7 @@ Nous allons nous intéresser aux genres des jeux indépendant pour voir s'il exi
 
 Tout d'abord, on extrait les genres des jeux AAA. Nous obtenons cette répartition :
 
-```{r AAA genres combinaisons, results='markup'}
+```{r AAA genres combinaisons}
 ggplot(non_indie_combinations, aes(x = reorder(genres, n), y = n, fill = genres)) +
   geom_col(position = "dodge") +
   coord_flip() +
@@ -1218,7 +1220,7 @@ ggplot(non_indie_combinations, aes(x = reorder(genres, n), y = n, fill = genres)
 
 On extrait maintenant les genres des jeux indépendants :
 
-```{r Indie genres combinaisons, results='markup'}
+```{r Indie genres combinaisons}
 ggplot(indie_combinations, aes(x = reorder(genres, n), y = n, fill = genres)) +
   geom_col(position = "dodge") +
   coord_flip() +
@@ -1389,12 +1391,6 @@ ggplot(top50_cat, aes(x = reorder(categories, total_owner_min), y = total_owner_
 
 
 ```
-
-
-
-
-
-
 
 ```{r}
 
@@ -1633,12 +1629,6 @@ ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
   theme_minimal(base_size = 10)
 
 ```
-
-
-```{r}
-
-```
-
 
 
 
