@@ -13,6 +13,78 @@ knitr::opts_chunk$set(
   warning = FALSE,
   results = 'hide' 
 )
+
+```
+
+```{r library importation}
+# Importation des library
+library(scales)
+library(lubridate)
+library(tidyverse)
+library(corrr)
+library(knitr)
+```
+
+```{r configuration}
+# Ce chunck permet de configurer le style de l'ensemble des visualisations
+
+# Choix du font/police d'écriture
+primary_font <- "Helvetica"
+secondary_font <- "Roboto"
+
+# Taille du texte
+title_fontsize <- 16
+axis_fontsize <- 12
+text_fontsize <- 10
+legend_fontsize <- 10
+
+# Choix des couleurs
+primary_color    <- "#1A9FFF" 
+secondary_color  <- "#324D67" 
+background_color <- "#171D25" 
+accent_color     <- "#66C0F4"
+font_color       <- "#DCDEDF" 
+  
+# Couleurs de remplissage 
+primary_palette <- c(
+  "#66C0F4",
+  "#6767F5",
+  "#1A9FFF",
+  "#6794F5",
+  "#5E8AA4",
+  "#B8CCF5",
+  "#3B6E8F", 
+  "#9567F5",
+  "#A3C9F5" 
+)
+
+# Scale gradiant
+steam_color_gradient <- scale_color_gradient(
+  low = "#A3C9F5",
+  high = "#1A2836"
+)
+
+steam_fill_gradient <- scale_fill_gradient(
+  low = "#A3C9F5",
+  high = "#1A2836"
+)
+  
+# Thème ggplot
+steam_theme <- theme_minimal(base_family = primary_font) + 
+  theme(
+    plot.background = element_rect(fill = background_color, color = background_color),
+    panel.background = element_rect(fill = background_color, color = NA),
+    panel.border = element_blank(),
+    panel.grid.major = element_line(color = "#2A3744"),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(color = font_color),
+    axis.title = element_text(color = font_color, face = "bold"),
+    plot.title = element_text(color = accent_color, face = "bold", size = 16),
+    plot.subtitle = element_text(color = font_color, size = 12),
+    legend.background = element_rect(fill = background_color, color = NA),
+    legend.text = element_text(color = font_color),
+    legend.title = element_text(color = font_color, face = "bold")
+  )
 ```
 
 # Introduction
@@ -125,12 +197,7 @@ Voici une liste non exhaustive des variables comparées ainsi que les visualisat
 
 ---
 
-```{r import}
-library(scales)
-library(lubridate)
-library(tidyverse)
-library(corrr)
-library(knitr)
+```{r import dataset}
 
 # Utilisé par Paul
 reviews <- read_csv("data/raw_reviews.csv") %>%
@@ -314,20 +381,20 @@ owners_count_clean <- owners_count_clean %>%
 
 # Visualisation
 ggplot(owners_count_clean, aes(x = nb_jeux, y = owners_range_short)) +
-  geom_col(fill = "#99CCFF") +
+  geom_col(fill = primary_color) +
   
   # Labels à l'intérieur des barres pour les grandes valeurs (>= 100)
   geom_text(
     data = owners_count_clean %>% filter(nb_jeux >= 100),
     aes(x = nb_jeux, label = label_number(big.mark = " ")(nb_jeux)),
-    hjust = 1.2, color = "#002244", size = 3.5
+    hjust = 1.2, size = 3.5, color = "white"
   ) +
   
   # Labels à l'extérieur à droite pour les petites valeurs (< 100)
   geom_text(
     data = owners_count_clean %>% filter(nb_jeux < 100),
     aes(x = nb_jeux, label = label_number(big.mark = " ")(nb_jeux)),
-    hjust = -0.2, color = "#002244", size = 3.5
+    hjust = -0.2, size = 3.5, color = "white"
   ) +
   
   scale_x_continuous(
@@ -340,13 +407,7 @@ ggplot(owners_count_clean, aes(x = nb_jeux, y = owners_range_short)) +
     x = "Nombre de jeux (échelle pseudo-log)",
     y = "Plage de propriétaires"
   ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
-    axis.title.y = element_text(size = 12),
-    axis.title.x = element_text(size = 12),
-    axis.text.y = element_text(size = 8)
-  ) +
+  steam_theme +
   coord_cartesian(clip = "off")
 ```
 
@@ -368,23 +429,19 @@ jeux_par_annee <- steamData %>%
 
 ```{r game_released_by_year_log}
 ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
-  geom_col(fill = "#2C7FB8") +
+  geom_col(fill = primary_color) +
   scale_x_continuous(breaks = pretty(jeux_par_annee$annee_sortie, n = 10)) +
   scale_y_continuous(
     trans = pseudo_log_trans(base = 10),
     breaks = c(1, 10, 100, 1000, 10000, 20000),
-    labels = comma_format()
+    labels = label_number(big.mark = " ")
   ) +
   labs(
     title = "Nombre de jeux sortis par année (échelle pseudo-log)",
     x = "Année de sortie",
     y = "Nombre de jeux (pseudo-log)"
   ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.title = element_text(size = 12)
-  )
+  steam_theme
 ```
 
 ### Observations :
@@ -397,19 +454,15 @@ Lancé en 2012, ce service va permettre à plus en plus de jeux de pouvoir inté
 
 ```{r game_released_by_year}
 ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
-  geom_col(fill = "#2C7FB8") +
+  geom_col(fill = primary_color) +
   scale_x_continuous(breaks = pretty(jeux_par_annee$annee_sortie, n = 10)) +
-  scale_y_continuous(labels = scales::comma) +
+  scale_y_continuous(labels = label_number(big.mark = " ")) +
   labs(
     title = "Nombre de jeux sortis par année",
     x = "Année de sortie",
     y = "Nombre de jeux"
   ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.title = element_text(size = 12)
-  )
+  steam_theme
 ```
 
 
@@ -436,19 +489,15 @@ genres_par_jeu <- steamData %>%
 genres_par_jeu %>%
   mutate(genres = fct_reorder(genres, nb_jeux)) %>%  # trie les genres selon le nombre de jeux
   ggplot(aes(x = nb_jeux, y = genres)) +
-  geom_col(fill = "#1f77b4") +
-  geom_text(aes(label = comma(nb_jeux)), hjust = -0.1, color = "black", size = 3) +
+  geom_col(fill = primary_color) +
+  geom_text(aes(label = label_number(big.mark = " ")(nb_jeux)), hjust = -0.1, color = font_color , size = 3) +
   labs(
     title = "Nombre de jeux par genre",
     x = "Nombre de jeux",
     y = "Genre"
   ) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.1)), labels = comma_format()) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.title = element_text(size = 12)
-  )
+  scale_x_continuous(expand = expansion(mult = c(0, 0.1)), labels = label_number(big.mark = " ")) +
+  steam_theme
 ```
 
 
@@ -463,7 +512,7 @@ genres_par_jeu %>%
 
 ## Matrice de corrélation
 
-```{r correlation_matrix}
+```{r correlation_matrix, dev.args = list(bg = background_color)}
 # Matrice de corrélation
 numeric_cols <- steamData %>%
   select(
@@ -503,41 +552,52 @@ cor_long <- cor_matrix %>%
 
 # 3. Plot ggplot avec diagonale gris clair
 ggplot(cor_long, aes(x = x, y = y)) +
+  # Tuiles hors diagonale
   geom_tile(
     data = cor_long %>% filter(!is_diag),
     aes(fill = r),
-    color = "white"
-  ) +  # triangle supérieur
+    color = background_color
+  ) + 
+  # Tuiles diagonales gris clair
   geom_tile(
     data = cor_long %>% filter(is_diag),
-    fill = "grey90",    # diagonale sobre en gris clair
-    color = "white"
+    aes(fill = r),
+    color = background_color
   ) +
+  # Valeurs de corrélation sauf diagonale
   geom_text(
     aes(label = ifelse(is_diag, "", round(r, 2))),
-    color = "black",
+    color = font_color,
     size = 3
   ) +
+  # Palette de corrélation
   scale_fill_gradient2(
-    low = "blue", high = "red",
+    low = "#5E8AA4",     # bleu foncé Steam
+    mid = "#66C0F4",     # bleu moyen
+    high = "#1A9FFF",    # gris clair Steam
+    midpoint = 0.5,
     limit = c(0, 1),
     name = "Corrélation"
   ) +
+  # Positionnement axes
   scale_x_discrete(position = "top", limits = rev(vars)) +
   scale_y_discrete(limits = rev(vars)) +
-  theme_minimal() +
-  labs(
-    title = NULL,
-    x = NULL,
-    y = NULL,
-    caption = "Matrice de corrélation de différentes variables du dataset"
-  ) +
+  steam_theme +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 0, vjust = 0.5, size = 10),
     axis.text.y = element_text(size = 10),
     plot.caption = element_text(hjust = 0.5, size = 14, face = "bold"),
     axis.ticks = element_blank(),
-    panel.grid = element_blank()
+    panel.grid = element_blank(),
+  ) +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = NULL,
+    caption = "Matrice de corrélation de différentes variables du dataset",
+  ) +
+  theme(
+    plot.caption = element_text(color = font_color, face = "bold", size = 16)
   ) +
   coord_fixed(ratio = 1)
 ```
@@ -778,14 +838,18 @@ Voici la répartition des joueurs sur la plateforme Steam sur les jeux en lignes
 ggplot(popularite_types, aes(x = reorder(type_de_jeu, total_joueurs_actifs), y = total_joueurs_actifs, fill = type_de_jeu)) +
   geom_col(show.legend = FALSE) +
   coord_flip() +
-  theme_minimal() +
-    scale_fill_brewer(palette = "Set2") +
+  steam_theme +
+  scale_fill_manual(values = primary_palette) +
   geom_text(aes(label = format(total_joueurs_actifs, big.mark = " ")),
             position = position_stack(vjust = 0.5),
-            hjust = 0.5) +
+            hjust = 0.5, color = "white") +
   labs(title = "Total des joueurs actifs par type de jeu",
        x = element_blank(),
-       y = "Nombre de joueurs actifs (Octobre 2024)")
+       y = "Nombre de joueurs actifs (Octobre 2024)") +
+  theme (
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10)
+  )
 ```
 
 ### Observations
@@ -826,20 +890,21 @@ proportions_globales <- mmo_vs_classicRPG %>%
 ggplot(proportions_globales, aes(x = "", y = proportion, fill = is_MMO)) +
   geom_bar(stat = "identity", width = 0.8) +
   scale_fill_manual(
-    values = c("FALSE" = "#4DAF4A", "TRUE" = "#FF7F00"),
+    values = primary_palette,
     name = "Type de jeu", 
     labels = c("RPG en ligne (non MMO)", "MMORPG")  
   ) +
   geom_text(
     aes(label = scales::percent(proportion, accuracy = 0.1)), 
-    position = position_stack(vjust = 0.5)
+    position = position_stack(vjust = 0.5),
+    color = "white"
   ) +
   labs(
     title = "Proportion des joueurs joaunt aux MMORPG aux RPG en ligne (non MMO)",
     x = "", 
     y = "Proportion (%)"
   ) +
-  theme_minimal() +
+  steam_theme +
   theme(
     axis.text.x = element_blank(),
     axis.title.x = element_blank()
@@ -873,9 +938,9 @@ jeux_populaires <- steamData %>%
   slice_head(n = 10)
 
 ggplot(jeux_populaires, aes(x = reorder(name, concurrent_users_yesterday), y = concurrent_users_yesterday)) +
-  geom_col(fill = "#1A9FFF", show.legend = FALSE) +
+  geom_col(fill = primary_color , show.legend = FALSE) +
   coord_flip() +
-  theme_minimal() +
+  steam_theme +
   theme(
   plot.margin = unit(c(0.5, 2.5, 0.5, 0.5), "cm")  # top, right, bottom, left
   ) +
@@ -883,13 +948,13 @@ ggplot(jeux_populaires, aes(x = reorder(name, concurrent_users_yesterday), y = c
   geom_text(
     data = jeux_populaires %>% filter(concurrent_users_yesterday >= 150000),
     aes(x = name, label = label_number(big.mark = " ")(concurrent_users_yesterday)),
-    hjust = 1.2, color = "#002244", size = 3.5
+    hjust = 1.2, color = "white", size = 3.5
   ) +
   # Labels à l'extérieur à droite pour les petites valeurs (< 100)
   geom_text(
     data = jeux_populaires %>% filter(concurrent_users_yesterday < 150000),
     aes(x = name, label = label_number(big.mark = " ")(concurrent_users_yesterday)),
-    hjust = -0.2, color = "#002244", size = 3.5
+    hjust = -0.2, color = "white", size = 3.5
   ) +
   
   labs(title = "Les jeux les plus populaires de Steam (Oct. 24)",
@@ -907,9 +972,9 @@ jeux_populaires_2025 <- read.csv("data/popular_games_june_2025.csv", sep = ";") 
   slice_head(n = 10)
 
 ggplot(jeux_populaires_2025, aes(x = reorder(name, concurrent_users_yesterday), y = concurrent_users_yesterday)) +
-  geom_col(fill = "#1A9FFF", show.legend = FALSE) +
+  geom_col(fill = primary_color , show.legend = FALSE) +
   coord_flip() +
-  theme_minimal() +
+  steam_theme +
   theme(
   plot.margin = unit(c(0.5, 2.5, 0.5, 0.5), "cm")  # top, right, bottom, left
   ) +
@@ -917,13 +982,13 @@ ggplot(jeux_populaires_2025, aes(x = reorder(name, concurrent_users_yesterday), 
   geom_text(
     data = jeux_populaires_2025 %>% filter(concurrent_users_yesterday >= 220000),
     aes(x = name, label = label_number(big.mark = " ")(concurrent_users_yesterday)),
-    hjust = 1.2, color = "#002244", size = 3.5
+    hjust = 1.2, color = "white", size = 3.5
   ) +
   # Labels à l'extérieur à droite pour les petites valeurs (< 100)
   geom_text(
     data = jeux_populaires_2025 %>% filter(concurrent_users_yesterday < 220000),
     aes(x = name, label = label_number(big.mark = " ")(concurrent_users_yesterday)),
-    hjust = -0.2, color = "#002244", size = 3.5
+    hjust = -0.2, color = "white", size = 3.5
   ) +
   
   labs(title = "Les jeux les plus populaires de Steam (Jun. 25)",
