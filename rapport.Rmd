@@ -30,7 +30,7 @@ library(knitr)
 library(treemapify)
 ```
 
-```{r configuration}
+```{r configuration style}
 # Ce chunck permet de configurer le style de l'ensemble des visualisations
 
 # Choix du font/police d'écriture
@@ -978,7 +978,9 @@ Il doit contenir au moins un des éléments suivants dans ses catégories ou tag
 
 -   `Multiplayer`, `Massively Multiplayer`, `Online Co-op`, etc.
 
-***Pour mesurer la popularité :*** On utilise le nombre de joueurs actifs en octobre 2024 (`concurrent_users_yesterday` dans les données).
+***Pour mesurer la popularité :*** 
+
+On utilise le nombre de joueurs actifs en octobre 2024 (`concurrent_users_yesterday` dans les données).
 
 ### Types de jeux en ligne
 
@@ -1112,7 +1114,7 @@ Note :
 
 -   Stardew Valley a le tag RPG et est un jeu qui peut se jouer en multijoueur mais peut-on considérer comme un jeu en ligne ? C'est le cas d'autres jeux principalement singleplayer mais qui peut se jouer en multijoueur.
 
-### Limites de résultats obtenus
+### Limites des résultats obtenus
 
 -   Les **tags Steam** et les **catégories** créées ne sont **pas assez précises** pour trouver les jeux en ligne car on se retrouve souvent à la frontière d'un jeu avec un système multijoueur et un jeu en ligne.
 
@@ -1211,11 +1213,22 @@ ggplot(jeux_populaires_2025, aes(x = reorder(name, concurrent_users_yesterday), 
 
 ### Conclusion
 
-On peut observer plusieurs caractéristiques communes des jeux les plus populaires sur Steam : - Les jeux sont `Free-to-play` - Les sorties récentes de jeux ou de contenus additionnels - Les soldes du jeu - Le jeu devienne le contenu tendance des créateurs de contenu (streamers/youtubers)
+On peut observer plusieurs caractéristiques communes des jeux les plus populaires sur Steam :
+
+- Les jeux sont `Free-to-play`
+- Les sorties récentes de jeux ou de contenus additionnels
+- Les soldes du jeu
+- Le jeu devienne le contenu tendance des créateurs de contenu (streamers/youtubers)
 
 Le classement des jeux les populaires est assez versatile mais le top 3 reste identique avec leurs grosses bases de joueurs.
 
-------------------------------------------------------------------------
+### Limite de l'analyse
+
+- Le nombre de joueurs récoltés de notre dataset n'est pas forcément une mesure très précise car elle enregistre le nombre de joueurs au moment de la récolte de la donnée. Or le nombre de joueurs d'un jeu varie grandement au cours d'une journée (plus de joueurs le soir et des heures creuses) et au cours de la semaine (plus de joueurs le week-end).
+
+
+
+---
 
 ## Analyse des notes des jeux AAA et indies
 
@@ -1551,7 +1564,7 @@ On peut également observer que les jeux multi et single player se valent mais c
 Les jeux en Coop sont significativement au delà des jeux coop online. Cela pourrait se traduire par l'envie des joueurs de jouer uniquement avec leurs amis ou au moins de ne pas jouer avec des gens aléatoire qui pourraientt avoir un écart de niveau important ou juste vouloir "troller". au demeurant, les jeux coop n'ont pas forcement de mode en ligne
 
 
-## meilleur catégories
+## Meilleures catégories
 Dans cette partie on se concentrera uniquement sur les catégories de jeux. Mais également sur tout l'historique des nombre de possesseurs contrairement au graphique précédent ou l'on évoquait les joueurs connectés.Les données utilisé portent sur les jeux de toutes les années de notre datasets
 
 ### Visualisation
@@ -1597,8 +1610,8 @@ ggplot(top50_cat, aes(x = reorder(categories, total_owner_min), y = total_owner_
   ) +
   scale_y_continuous(labels = comma) +  # <--- C'est cette ligne qui enlève les exposants
   steam_theme +
-  theme_minimal(base_size = 10) +
   theme(
+    base_size = 10,
     axis.text.x = element_text(angle = 75, hjust = 1, size = 7),
     plot.title = element_text(size = 13, face = "bold"),
     axis.title.x = element_text(size = 10),
@@ -1653,7 +1666,9 @@ ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
     color = "Tag"
   ) +
   steam_theme +
-  theme_minimal(base_size = 10)
+  theme(
+    base_size = 10
+  )
 
 ## 2. Jeux sortis avant ou en 2015 (top 10 tags)
 games_tags_pre2015 <- games_tags %>% filter(year <= 2013) %>% filter(year > 2005)
@@ -1678,7 +1693,6 @@ ggplot(genre_year_pre2015_top, aes(x = year, y = n, color = tag)) +
     y = "Nombre de jeux sortis",
     color = "Tag"
   ) +
-  
   steam_theme
 
 ## 3. Jeux sortis après 2013 
@@ -1705,7 +1719,6 @@ ggplot(genre_year_post2015_top, aes(x = year, y = n, color = tag)) +
     color = "Tag"
   ) +
   steam_theme 
-
 
 ```
 
