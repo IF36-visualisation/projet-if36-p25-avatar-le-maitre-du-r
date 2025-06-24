@@ -1023,13 +1023,13 @@ Le classement des jeux les populaires est assez versatile mais le top 3 reste id
 
 ### Introduction
 
-L'industrie du jeu vidéo traverse une période compliquée depuis plusieurs années. Les plus grosses entreprises du milieu enchaînent des polémiques entre licencements intensifs, management toxique et jeux très moyens aux yeux de la critique dont les prix ne cessent d'augmenter.
+L'industrie du jeu vidéo traverse une période compliquée depuis plusieurs années. Les plus grosses entreprises du milieu enchaînent les polémiques : entre licencements intensifs, management toxique et jeux très moyens aux yeux de la critique dont les prix ne cessent d'augmenter, le milieu ne cesse d'évoluer.
 
-**Qu'est ce qu'un jeu AAA ?**
+**Quelle est la différence entre un jeu studio et un jeu indépendant ?**
 
-C'est un terme utilisé pour classifier les jeux vidéo dotés de budgets de développement et de promotion élevés. Ce sont donc des jeux censés présenter de grandes qualités.
+Un jeu studio est un jeu vidéo développé par une entreprise. On peut attribuer ce terme pour classifier les jeux vidéos dotés d'un certain budget de développement et de promotion, avec de grandes équipes d'employés. On peut donc s'attendre à des productions de qualité, avec des jeux vidéos AA voire même AAA selon la quantité de ressources utilisée pour le développement du projet.
 
-Cependant, les productions AAA font face à plusieurs critiques récurrentes telles que le manque d'innovation, une uniformisation des contenus, ou encore des pratiques commerciales controversées (microtransactions, loot boxes, DLC abusifs).
+Cependant, ces productions font face à plusieurs critiques récurrentes telles que le manque d'innovation, une uniformisation des contenus, ou encore des pratiques commerciales controversées (microtransactions, loot boxes, DLC abusifs).
 
 À l'opposé, les jeux indépendants sont souvent développés par des équipes réduites ou par des développeurs individuels disposant de moyens financiers et techniques limités. Ce contexte leur permet généralement une plus grande liberté créative, donnant naissance à des jeux originaux, audacieux et parfois innovants.
 
@@ -1037,42 +1037,42 @@ Cependant, les productions AAA font face à plusieurs critiques récurrentes tel
 
 Face à ce contexte qui oppose budget et innovation, une question se soulève quant à la qualité des jeux auprès du grand public :
 
-> Les jeux indépendants obtiennent-ils de meilleures évaluations que les AAA ?
+> Les jeux indépendants obtiennent ils de meilleures évaluations que les jeux fait par des studios ?
 
 ### Chargement et préparation des données
 
-Afin de réaliser l'analyse, on va utiliser les fichiers [raw_reviews.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/raw_reviews.csv) et [tags.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/tags.csv) qui seront suffisants. Les deux fichiers sont reliés par app_id, tags.csv va nous permettre de séparer les jeux par le groupe des jeux indépendants et celui des jeux AAA, et raw_reviews.csv va nous permettre d'obtenir les notes attribuées pour chaque jeu.
+Afin de réaliser l'analyse, on va utiliser les fichiers [raw_reviews.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/raw_reviews.csv) et [tags.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/tags.csv) qui seront suffisants. Les deux fichiers sont reliés par `app_id`, tags.csv va nous permettre de séparer les jeux par le groupe des jeux indépendants et celui des jeux studios, et raw_reviews.csv va nous permettre d'obtenir les notes attribuées pour chaque jeu. Dans un second temps, nous utiliseront la variable steamData qui regroupe l'ensemble des données pour faire des analyses plus précises.
 
 ### Préparation des jeux
 
-Steam possède un tag spécialement pour les jeux indépendants, qui se nomme "Indie". Ce n'est pas le cas pour les jeux AAA. Cependant, on peut facilement les obtenir en récupérant l'ensemble des jeux, puis en enlevant les jeux indépendants :
+Steam possède un tag spécialement pour les jeux indépendants, qui se nomme "Indie". Ce n'est pas le cas pour les jeux de studios. Cependant, on peut facilement les obtenir en récupérant l'ensemble des jeux, puis en enlevant les jeux indépendants.
 
-```{r indie_aaa}
+```{r Trie des jeux indépendants et des jeux studios}
 indie_games <- tags %>%
   mutate(app_id = as.character(app_id)) %>%
   filter(tag == "Indie") %>%
   distinct(app_id) %>%
   mutate(type_game = "Indépendant")
 
-aaa_games <- tags %>%
+studio_games <- tags %>%
   mutate(app_id = as.character(app_id)) %>%
   anti_join(indie_games, by = "app_id") %>%
   distinct(app_id) %>%
-  mutate(type_game = "AAA")
+  mutate(type_game = "Studio")
 
 nrow(indie_games)
-nrow(aaa_games)
+nrow(studio_games)
 
-types_games <- bind_rows(indie_games, aaa_games)
+types_games <- bind_rows(indie_games, studio_games)
 ```
 
-Par la suite, on peut tout mettre dans un nouveau dataset nommé types_games qui recense l'ensemble des jeux avec leur catégorie propre.
+Par la suite, on peut tout mettre dans un nouveau dataset nommé `types_games` qui recense l'ensemble des jeux avec leur catégorie propre.
 
 ### Préparation des évaluations
 
-Pour les évaluations, on va créer un nouveau dataset avec seulement les informations dont nous avons besoin, c'est à dire app_id et review_score_description. On va ensuite filtrer review_score_description afin d'obtenir seulement les jeux qui ont une évaluation. La colonne peut avoir d'autres valeurs, comme "None", "1 user reviews" etc... car Steam attribue une évaluation à un jeu seulement à partir d'un certain nombre d'évaluations de la part de la communauté.
+Pour les évaluations, on va créer un nouveau dataset avec seulement les informations dont nous avons besoin, c'est à dire `app_id` et `review_score_description`. On va ensuite filtrer `review_score_description` afin d'obtenir seulement les jeux qui ont une évaluation. La colonne peut avoir d'autres valeurs, comme "None", "1 user reviews" etc... car Steam attribue une évaluation à un jeu seulement à partir d'un certain nombre d'évaluations de la part de la communauté.
 
-```{r}
+```{r Récupération des évaluations}
 evaluations <- reviews %>%
   filter(review_score_description %in% c(
     "Very Negative", "Mostly Negative", "Mixed",
@@ -1082,17 +1082,17 @@ evaluations <- reviews %>%
   inner_join(types_games, by = "app_id")
 ```
 
-### Visualisation
+### Visualisations
 
-Enfin, pour la visualisation de nos données, on s'est orienté sur un diagramme à barres. L'objectif est de comparer directement les types de jeu selon le niveau d'évaluation.
+Enfin, pour la visualisation de nos données, je me suis orienté sur un diagramme à barres. L'objectif est de comparer directement les types de jeu selon le niveau d'évaluation.
 
-```{r}
+```{r Première visualisation}
 evaluations %>%
   mutate(review_score_description = factor(review_score_description, levels = c("Very Negative", "Mostly Negative", "Mixed", "Mostly Positive", "Very Positive", "Overwhelmingly Positive"))) %>%
   count(review_score_description, type_game) %>%
   ggplot(aes(x = review_score_description, y = n, fill = type_game)) +
   geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("Indépendant" = "red", "AAA" = "blue")) +
+  scale_fill_manual(values = c("Indépendant" = "#66C0F4", "Studio" = "#9567F5")) +
   labs(
     title = "Répartition du nombre de jeux par évaluation et par type",
     x = "Niveau d'évaluation",
@@ -1100,14 +1100,15 @@ evaluations %>%
     fill = "Type de jeu"
   ) +
   theme_minimal() +
+  steam_theme +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-Le problème est que ce n'est pas égal de faire la comparaison actuellement. Comme on peut le voir plus au dessus grâce à la fonction nrow, aaa_games possède 54 252 jeux, tandis que indie_games en possède 63 253. On va donc faire une moyenne globale pour être au même niveau.
+Le problème est que ce n'est pas égal de faire la comparaison actuellement. Comme on peut le voir plus au dessus grâce à la fonction nrow, `studio_games` possède 54 252 jeux, tandis que `indie_games` en possède 63 253. On va donc faire une moyenne globale pour être au même niveau.
 
-La fonction geom_bar nous permet de définir l'option "position = dodge" afin d'avoir les barres côte à côte pour une meilleure lisibilité.
+La fonction "geom_bar" nous permet de définir l'option "position = dodge" afin d'avoir les barres côte à côte pour une meilleure lisibilité.
 
-```{r Evaluation Indie/AAA chart}
+```{r Seconde visualisation}
 evaluations %>%
   mutate(review_score_description = factor(review_score_description, levels = c("Very Negative", "Mostly Negative", "Mixed", "Mostly Positive", "Very Positive", "Overwhelmingly Positive"))) %>%
   count(review_score_description, type_game) %>%
@@ -1117,193 +1118,120 @@ evaluations %>%
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = sprintf("%.1f%%", percentage)), 
           position = position_dodge(width = 1), 
-          vjust = -0.25, size = 3) +
-  scale_fill_manual(values = c("Indépendant" = "red", "AAA" = "blue")) +
+          vjust = -0.25,
+          color = font_color,
+          size = 3) +
+  scale_fill_manual(values = c("Indépendant" = "#66C0F4", "Studio" = "#9567F5")) +
   labs(
     title = "Répartition proportionnelle des évaluations par type de jeu",
     x = "Niveau d'évaluation",
     y = "Pourcentage de jeux",
     fill = "Type de jeu"
   ) +
+  theme_minimal() +
+  steam_theme +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ### Observations
 
-L'analyse du graphique montre que, proportionnellement, les jeux AAA obtiennent légèrement plus d'évaluations "Very Positive" que les jeux indépendants. Toutefois, les différences restent relativement faibles et la majorité des jeux indépendants se situent également dans des évaluations globalement positives. Les jeux indépendants affichent une proportion un peu plus élevée d'évaluations "Mixed", ce qui pourrait refléter une plus grande diversité de qualité au sein de cette catégorie. Cela amène à nuancer l'hypothèse initiale : si les jeux indépendants reçoivent beaucoup de bonnes évaluations, les jeux AAA conservent tout de même une légère avance en termes de perception positive moyenne sur Steam.
+L'analyse du graphique montre que, proportionnellement, les jeux issus de studios obtiennent légèrement plus d'évaluations "Very Positive" que les jeux indépendants. Toutefois, les différences restent relativement faibles, et la majorité des jeux indépendants reçoivent également des évaluations globalement positives. Les jeux indépendants affichent une proportion un peu plus élevée d'évaluations "Mixed", ce qui pourrait refléter une plus grande diversité de qualité au sein de cette catégorie. Cela amène à nuancer l'hypothèse initiale : si les jeux indépendants reçoivent de nombreuses bonnes évaluations, les jeux de studios conservent tout de même une légère avance en termes de perception positive moyenne sur Steam.
 
-Cette hypothèse vient du fait que aujourd'hui, les joueurs sont focalisés sur un léger pourcentage de jeux par rapport à l'entièreté du monde du jeu vidéo. Tous les jours de nouveaux jeux sortent, tous les jours il peut y en avoir d'excellents, mais ils ne feront pas le même bruit que les jeux colossaux développés par les grandes entreprises, comme Microsoft, Ubisoft, Activision Blizzard, Rockstar etc...
+Cette hypothèse découle du fait qu'aujourd’hui, les joueurs se focalisent sur une petite partie du monde vidéoludique. De nouveaux jeux sortent chaque jour ; certains sont excellents, mais ils ne bénéficieront pas forcément de la même visibilité que les jeux colossaux développés par les grandes entreprises, comme Microsoft, Ubisoft, Activision Blizzard, Rockstar, etc.
 
 ### Focus sur différents studios de jeux
 
-Dans cette section, nous nous intéressons à trois studios aux profils très différents afin de comparer les jeux qu’ils produisent, notamment en termes de notes et réception critique :
+Nous allons maintenant comparer différents studios, avec d’un côté des studios produisant des jeux AAA, et de l’autre, des studios indépendants. Nous nous appuierons sur six studios aux profils variés :
 
-- **Ubisoft** : un studio mythique et reconnu qui produit des jeux AAA
-- **Supergiant Games** : un studio indépendant qui produit des jeux indépendants
-- **FromSoftware Inc.** : un studio produisant des jeux AAA mais dans un registre différent qu'Ubisoft
+- **Ubisoft** : studio français mythique et reconnu, à l’origine de nombreuses productions AAA telles que Assassin’s Creed et Far Cry.
+- **Supergiant Games** : studio indépendant qui a marqué les esprits avec le jeu Hades.
+- **FromSoftware Inc.** : studio AAA évoluant dans un registre différent d’Ubisoft, notamment connu pour la série Dark Souls.
+- **Scott Cawthon**: développeur indépendant ayant créé à lui seul l’un des plus grands univers du jeu d’horreur : Five Nights at Freddy’.
+- **Treyarch**: branche emblématique d’Activision, responsable d’une partie du développement des jeux Call of Duty, notamment la série Black Ops.
+- **Moon Studios**: studio indépendant qui a ébloui le monde du jeu vidéo avec le style artistique de la série Ori.
 
-L'objectif de cette partie est de regarder les notes des différents jeux des studios avec leurs approches différentes en terme de production de jeux vidéos et d'explorer davantage la question de la notation et de la potentiel influence du tag `indie`.
+Maintenant que nous avons réuni des studios issus de tous les horizons, nous allons observer les évaluations obtenues pour plusieurs de leurs jeux et les comparer. L’objectif est d’explorer davantage la question de la notation et la potentielle influence du tag "Indie".
 
-Nous allons prendre les 5 jeux de chaque studio ayant obtenu le plus de notes sur Steam.
-
-### Notes obtenus
-
-```{r Ubisoft vs Supergiant vs FromSoftware}
-# Obtenir les jeux des studios
+```{r Focus sur 6 studios différents}
 ubisoft_games <- steamData %>%
-  filter(str_detect(tolower(developer), "ubisoft")) %>%
-  filter(type=='game') %>%
-  select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total)
+  filter(str_detect(developer, "Ubisoft")) %>%
+  filter(type == "game") %>%
+  select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total) %>%
+  mutate(studio = "Ubisoft")
+
+supergiant_games <- steamData %>%
+  filter(str_detect(developer, "Supergiant Games")) %>%
+  filter(type == "game") %>%
+  select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total) %>%
+  mutate(studio = "Supergiant Games")
+
+fromsoftware_games <- steamData %>%
+  filter(str_detect(developer, "FromSoftware")) %>%
+  filter(type == "game") %>%
+  select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total) %>%
+  mutate(studio = "FromSoftware")
+
+scottcawthon_games <- steamData %>%
+  filter(str_detect(developer, "Scott Cawthon")) %>%
+  filter(type == "game") %>%
+  select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total) %>%
+  mutate(studio = "Scott Cawthon")
+
+treyarch_games <- steamData %>%
+  filter(str_detect(developer, "Treyarch")) %>%
+  filter(type == "game") %>%
+  select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total) %>%
+  mutate(studio = "Treyarch")
+
+moonstudios_games <- steamData %>%
+  filter(str_detect(developer, "Moon Studios GmbH")) %>%
+  filter(type == "game") %>%
+  select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total) %>%
+  mutate(studio = "Moon Studios")
+
+all_games_studios <- bind_rows(
+  ubisoft_games,
+  supergiant_games,
+  fromsoftware_games,
+  scottcawthon_games,
+  treyarch_games,
+  moonstudios_games
+)
   
+avg_per_studio <- all_games_studios %>%
+  filter(!is.na(proportion_avis_positif)) %>%
+  mutate(proportion_avis_positif = proportion_avis_positif * 100) %>%
+  group_by(studio) %>%
+  summarise(
+    avg_positive_reviews = mean(proportion_avis_positif, na.rm = TRUE),
+    number_of_games = n()
+  ) %>%
+  arrange(desc(avg_positive_reviews))
 
-supergiant_games <-steamData %>%
-    filter(str_detect(tolower(developer), "supergiant games")) %>%
-    filter(type=='game') %>%
-    select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total)
-
-fromsoftware_games = steamData %>%
-    filter(str_detect(tolower(developer), "fromsoftware")) %>%
-    filter(type=='game') %>%
-    select(proportion_avis_positif, metacritic_score, name, release_date, owners_range, total)
-
-# On prends les 5 jeux qui ont le plus d'avis (pas forcément les jeux qui ont le plus de propriétaires)
-top5_ubisoft = ubisoft_games %>%
-  arrange(desc(total)) %>%
-  slice_head(n=5)
-
-top5_supergiant = supergiant_games %>%
-  arrange(desc(total)) %>%
-  slice_head(n=5)
-
-top5_fromsoftware = fromsoftware_games %>%
-  arrange(desc(total)) %>%
-  slice_head(n=5)
-
-# Table Ubisoft
-top5_ubisoft <- top5_ubisoft %>%
-  select(name, release_date, metacritic_score, proportion_avis_positif, total) %>%
-  mutate (proportion_avis_positif = proportion_avis_positif * 100) %>%
-  rename(
-    Jeu = name,
-    `Date de sortie` = release_date,
-    `Note Metacritic` = metacritic_score,
-    `Proportion d'avis positif Steam` = proportion_avis_positif,
-    `Nombre d'avis total` = total
-  )
-
-kable(top5_ubisoft,
-      caption = "Notes des jeux Ubisoft", digits = 2)
-
-# Table Supergiant
-top5_supergiant <- top5_supergiant %>%
-  select(name, release_date, metacritic_score, proportion_avis_positif, total) %>%
-  mutate (proportion_avis_positif = proportion_avis_positif * 100) %>%
-  rename(
-    Jeu = name,
-    `Date de sortie` = release_date,
-    `Note Metacritic` = metacritic_score,
-    `Proportion d'avis positif Steam` = proportion_avis_positif,
-    `Nombre d'avis total` = total
-  )
-
-kable(top5_supergiant,
-      caption = "Notes des jeux Supergiant Games", digits = 2)
-
-# Table Fromsoftware
-top5_fromsoftware <- top5_fromsoftware %>%
-  select(name, release_date, metacritic_score, proportion_avis_positif, total) %>%
-  mutate (proportion_avis_positif = proportion_avis_positif * 100) %>%
-  rename(
-    Jeu = name,
-    `Date de sortie` = release_date,
-    `Note Metacritic` = metacritic_score,
-    `Proportion d'avis positif Steam` = proportion_avis_positif,
-    `Nombre d'avis total` = total
-  )
-
-kable(top5_fromsoftware,
-      caption = "Notes des jeux FromSoftware Inc.", digits = 2)
+ggplot(avg_per_studio, aes(x = reorder(studio, avg_positive_reviews), y = avg_positive_reviews, fill = studio)) +
+  geom_col() +
+  geom_text(aes(label = paste0(sprintf("%.1f%%", avg_positive_reviews), "\n(", number_of_games, " jeux)")),
+            vjust = 2.5,
+            size = 4) +
+  labs(
+    title = "Note moyenne des avis positifs par studio \navec le nombre de jeux",
+    x = "Studio",
+    y = "Proportion moyenne d'avis positifs",
+    fill = "studio"
+  ) +
+  scale_y_continuous(labels = function(x) paste0(x, "%"), limits = c(0, 100)) +
+  theme_minimal() +
+  steam_theme +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ### Observations
 
-- On note que les notes les plus élevées ont été obtenus par les jeux de **Supergiant Games**, le studio de jeux indépendant qui ne possède pas le budget des deux autres studios.
-- Cependant, cela reste à nuancer : le nombre total de note est nettement moins élevé pour les jeux de Supergiant Games comparé aux jeux des deux studios.
-- On ne peut pas conclure facilement que les jeux d'un studio indie reconnu obtiennent de meilleures notes que les studios AAA car les jeux de **FromSoftware Inc.** obtiennent des bonnes notes (environ 90% d'approbation sur les jeux les plus notés du studio).
-
-### Les genres des jeux Indies sont-elles plus innovantes ?
-
-```{r Genres des jeux Indie}
-indie_games_genres <- steamData %>% 
-  filter(str_detect(genres, "Indie"))
-
-indie_games_tags <- steamData %>% 
-  filter(str_detect(tags, "indie"))
-
-indie_games = indie_games_genres %>% left_join(indie_games_tags)
-
-non_indie_games <- steamData %>%
-  anti_join(indie_games) %>%
-  filter(type == "game") %>%
-  filter(owners_range != "0 .. 20,000")
-
-indie_combinations <- indie_games %>%
-  count(genres, sort = TRUE) %>%
-  mutate(genres = if_else(
-    genres == "Indie",
-    genres,  # on garde tel quel si c'est uniquement "Indie"
-    str_remove_all(genres, "\\bIndie\\b,?\\s*") %>%
-      str_remove_all(",\\s*$") %>%
-      str_trim()
-  )) %>%
-  slice_max(n, n = 10)
-
-non_indie_combinations <- non_indie_games %>%
-  count(genres, sort = TRUE) %>%
-  slice_max(n, n = 10)
-
-```
-
-Nous allons nous intéresser aux genres des jeux indépendant pour voir s'il existe des combinaisons de genres différentes comparé aux jeux AAA. 
-
-Tout d'abord, on extrait les genres des jeux AAA. Nous obtenons cette répartition :
-
-```{r AAA genres combinaisons}
-ggplot(non_indie_combinations, aes(x = reorder(genres, n), y = n, fill = genres)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(title = "Combinaisons de genres les plus fréquentes",
-       x = "Combinaisons de genres",
-       y = "Nombre de jeux") +
-  theme_minimal()
-```
-
-### Observations :
-
-- Le genre le plus fréquent chez les jeux AAA sont les genres `Action`, `Aventure`, `Action/Aventure` et `Strategy`
-
-
-On extrait maintenant les genres des jeux indépendants :
-
-```{r Indie genres combinaisons}
-ggplot(indie_combinations, aes(x = reorder(genres, n), y = n, fill = genres)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(title = "Combinaisons de genres les plus fréquentes",
-       x = "Combinaisons de genres",
-       y = "Nombre de jeux") +
-  theme_minimal()
-```
-
-### Obesrvations :
-
-- Le genre `Casual` est majoritaire dans les jeux indies, suivi de près par le genre `Action`
-- Il y a plus de multi-genres dans les jeux indies que sur les AAA
-- La plupart des genres des jeux indies contiennent le genre `Casual` combiné avec un autre genre ou tout seul
+Suite à cette visualisation, on peut constater que les trois studios indépendants sont ceux qui obtiennent proportionnellement le plus de notes positives. Ils sont suivis de près par FromSoftware. L'objectif ici est uniquement de constater les avis des joueurs par rapport aux jeux produits. Les chiffres ne sont pas équivalents, mais, par exemple, Hades, un grand jeu indépendant produit par Supergiant Games, a reçu 258 000 évaluations, un chiffre qu’aucun jeu AAA produit par les grands studios de la liste n’a atteint.
 
 ### Conclusion
 
-Les jeux indies ne possèdent pas la même tendance de genres que les jeux AAA. Ces jeux possèdent généralement le genre `Casual` et sont souvent en multi-genre. Nous ne pouvons pas conclure sur une certaine innovation des genres des jeux indies car mise à part le genre `Casual` nettement présent, le genre `Action` et `Adventure` sont majoritaires dans les deux catégories de jeux.
+Pour conclure, non, les jeux indépendants n’obtiennent pas nécessairement de meilleures notes que ceux produits par les gros studios. On peut toutefois constater qu’une forme de méritocratie s’est installée dans l’esprit des joueurs : ils font beaucoup de bruit pour des jeux indépendants excellents, et de même pour dénoncer des jeux à gros budget jugés médiocres. Il n’est pas normal qu’avec des moyens colossaux, certaines entreprises livrent des produits inachevés, sans âme, au point d’en oublier le concept même du jeu vidéo : l’amusement.
 
 ---
 
