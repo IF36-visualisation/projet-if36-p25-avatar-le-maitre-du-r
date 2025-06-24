@@ -1457,37 +1457,28 @@ Il n’est pas normal qu’avec des moyens colossaux, certaines entreprises livr
 
 ------------------------------------------------------------------------
 
-## Tendance des jeux sortis récemments
-
+## Tendance des jeux sortis récemments (Jules PERRIN)
 # Contexte général
+Steam est une plateforme qui propose l'un des plus gros catalogue de jeux vidéo du marché. Chaque jeu proposé a plusieurs caractéristiques (nom, prix, éditeur , etc). Parmi ces caractéristiques, l'une d'entre elle nous intéresse particulièrement dans ce rapport. En effet les tags permettent aux joueurs de se faire une idée rapide des jeux proposés ou encore de rechercher de nouveaux jeux selon leur préférences.
 
-Steam est une plateforme qui propose l'un des plus gros catalogue de jeux vidéo du marché.
-Chaque jeu proposé a plusieurs caractéristiques (nom, prix, éditeur , etc).
-Parmi ces caractéristiques, l'une d'entre elle nous intéresse particulièrement dans ce rapport.
-En effet les tags permettent aux joueurs de se faire une idée rapide des jeux proposés ou encore de rechercher de nouveaux jeux selon leur préférences.
+Le jeu de données que nous allons utiliser ne comporte pas de données permettant de dresser une temporalité. Ce rapport portera donc sur les données du catalogue Steam en octobre 2024.
 
-Le jeu de données que nous allons utiliser ne comporte pas de données permettant de dresser une temporalité.
-Ce rapport portera donc sur les données du catalogue Steam en octobre 2024.
-
-Les catégories ne doivent pas être confondues avec les tags.
-Ici les catégories représentent comment l'on joue au jeu (multiplayer, online pvp, remote play on phone etc).
-Alors que les tags représentent à quoi l'on joue (survival, tactical, FPS, old school, etc).
+Les catégories ne doivent pas être confondues avec les tags. Ici les catégories représentent comment l'on joue au jeu (multiplayer, online pvp, remote play on phone etc). Alors que les tags représentent à quoi l'on joue (survival, tactical, FPS, old school, etc). 
 
 # Problématique
 
-Ce rapport traitera une question pour le moment:
+Ce rapport traitera une question pour le moment: 
 
--   Quelle est la tendance des jeux sortis récemment ?
-
-Cela nous permettra d'avoir une idée globale de la dispersion des joueurs dans les catégories majeurs sur steam pour les nouveaux jeux.
-Pourrait être utile à un studio pour orienter son futur jeux vidéo par example.
-
+ - Quelle est la tendance des jeux sortis récemment ?
+ 
+Cela nous permettra d'avoir une idée globale de la dispersion des joueurs dans les catégories majeurs sur steam pour les nouveaux jeux. Pourrait être utile à un studio pour orienter son futur jeux vidéo par example. 
+ 
 # Analyse
-
 ## Import des données
 
 Premièrement il faut importer les données nécessaires à cette analyse.
-Ainsi que charger les librairies requises pour travailler et visualiser les données Les données des fichiers tags, steamspy et games sont nécéssaires
+Ainsi que charger les librairies requises pour travailler et visualiser les données
+Les données des fichiers tags, steamspy et games sont nécéssaires
 
 ```{r importe, message=FALSE, warning=FALSE}
 library(tidyr)
@@ -1503,10 +1494,7 @@ games <- read_delim("data/clean_games.csv", delim=";", show_col_types = FALSE)
 
 ### Précision et définition
 
-Ici on cherche à représenter la tendance actuelle.
-On utilisera donc la population steam présente le jour de la construction du dataset (bien que pas objectivement représentatif cf. interprétation).
-On cherche également à se concentrer sur les jeux récents.
-On utilisera donc tous les jeux sortis en 2024
+Ici on cherche à représenter la tendance actuelle. On utilisera donc la population steam présente le jour de la construction du dataset (bien que pas objectivement représentatif cf. interprétation). On cherche également à se concentrer sur les jeux récents. On utilisera donc tous les jeux sortis en 2024
 
 ```{r}
 games_2024 <- games %>%
@@ -1534,6 +1522,7 @@ tag_players %>%
 ```
 
 Voila donc un aperçu des tags les plus populaires selon le contexte établi
+## meilleur tags
 
 ### Visualisation
 
@@ -1554,26 +1543,17 @@ ggplot(tag_players,
 
 ### Interprétation
 
-On peut observer des tags assez génériques néanmoins on peut s'interroger sur la présence d'early access.
-Est ce que cette position dans les tags résulte de la curiosité des joueurs pour les jeux "non sortis" en général.
-Ou bien est-ce qu'un triple A était très attendu et est sorti en early acces en 2024.
+On peut observer des tags assez génériques néanmoins on peut s'interroger sur la présence d'early access. Est ce que cette position dans les tags résulte de la curiosité des joueurs pour les jeux "non sortis" en général. Ou bien est-ce qu'un triple A était très attendu et est sorti en early acces en 2024.
 
 On peut également observer que les jeux multi et single player se valent mais cette interprétation est à nuancer car les jeux peuvent avoir les 2 tags de par la présence d'une campagne ou d'un mode histoire.
 
-Les jeux en Coop sont significativement au delà des jeux coop online.
-Cela pourrait se traduire par l'envie des joueurs de jouer uniquement avec leurs amis ou au moins de ne pas jouer avec des gens aléatoire qui pourraientt avoir un écart de niveau important ou juste vouloir "troller".
-au demeurant, les jeux coop n'ont pas forcement de mode en ligne
+Les jeux en Coop sont significativement au delà des jeux coop online. Cela pourrait se traduire par l'envie des joueurs de jouer uniquement avec leurs amis ou au moins de ne pas jouer avec des gens aléatoire qui pourraientt avoir un écart de niveau important ou juste vouloir "troller". au demeurant, les jeux coop n'ont pas forcement de mode en ligne
 
-### Limites et attentions
 
-Il faut absolument garder en tête que le dataset ne se base pas sur tout l'historique de steam mais bien sur une journée ce qui peut donc ne pas être représentatif à la perfection.
+## meilleur catégories
+Dans cette partie on se concentrera uniquement sur les catégories de jeux. Mais également sur tout l'historique des nombre de possesseurs contrairement au graphique précédent ou l'on évoquait les joueurs connectés.Les données utilisé portent sur les jeux de toutes les années de notre datasets
 
-Les résultat présents sont limités par le fait que beaucoup de jeux peuvent avoir plusieurs tags et donc compter plusieurs fois et biaiser les résultat.
-Ici impossible de faire la distcntion car il n'y a pas de hiérarchisation des tags.
-Néamoins une possibilité pourrait être de donner un poids aà certains tags trop générique pour observer des résultat plus axé sur le theme du jeux en lui même (military plutot que multiplayer)
-
-Nous sommes également limité par l'explicité des tags, par exemple, Coop online est-il réservé au jeux qui proposent un matchmaking ou aux jeux permettant d'invité ses amis ou les deux.
-Ces petites imprécision affecte également la pertinence de l'analyse.
+### Visualisation
 
 ```{r}
 #caté les plus populaires sur steam
@@ -1582,6 +1562,7 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 library(ggplot2)
+
 
 
 library(scales)
@@ -1624,6 +1605,16 @@ ggplot(top50_cat, aes(x = reorder(categories, total_owner_min), y = total_owner_
 
 
 ```
+
+### Interprétation
+On peut voir que premierement que les catégories les plus présente sont très générique. Cela peut s'expliquer du fait qu'elle sont présente sur énormément de jeux qu'elle que soit leurs autre catégories. Typiquement on ne vois pas de catégories spécifique comme "farm" ou "war" par exemple. 
+
+
+##Evolution des tags
+Dans cette partie on reviendra sur les tags les plus présents en fonction des années de sortie. Pour cela on prend les 10 tags les plus utilisé globalement et on regade leurs évolution.
+
+### Visualisation
+Le premier graphique représente toute la période du dataset. Les deux suivant son des focus sur les période avant et après 2013
 
 ```{r}
 
@@ -1714,6 +1705,17 @@ ggplot(genre_year_post2015_top, aes(x = year, y = n, color = tag)) +
 
 ```
 
+### Interprétation
+Sur le graphique global on voit une explosion du nombre de jeux en 2013. Une explication probable est la sortie de la PS4 et Xbox One cette année là. Les éditeurs se sont peut être concentré sur des version pc plutot que sur des édition console qui aurait touché une population plus faible de joueurs. 
+
+Quand au tag en eux-même, on remarque une forte ascencion des jeux independant ainsi que des jeux single player notamment sur l'année 2020 et 2021. Cette augementation des jeux single player pourrait être expliqué par le covid. Tous les "petit jeux" pouvais être des jeux rapide à développer pour les studio pour répondre à une demande immédiate.
+
+Sur les deux grap de focus, on peut remarquer une croissance assez stable grace à cette séparation.
+
+### Correlation tag-grosse sortie
+Cette dernière partie visera à déterminé si un jeu best seller peu influencer ces tags ou est ce que c'est plutôt un tendance global qui influait ces tags
+
+### Visualisation
 ```{r}
 # 1. Préparation des données
 games_tags <- left_join(tags, clean_games %>% select(app_id, release_date), by = "app_id") %>%
@@ -1791,6 +1793,29 @@ genre_year_all_top <- genre_year_all %>% filter(tag %in% top_tags_all)
 top_game_all <- get_top_game_by_year(games_with_owners)
 top_game_all_label <- get_label_position(genre_year_all_top, top_game_all)
 
+# --- Graphique 3 : global ---
+ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 1.6) +
+  geom_vline(
+    data = top_game_all_label, 
+    aes(xintercept = year), 
+    linetype = "dotted", color = "black", linewidth = 0.6
+  ) +
+  geom_text(
+    data = top_game_all_label,
+    aes(x = year, y = y_max, label = stringr::str_trunc(name, 15, "right")),
+    color = "black",
+    angle = 90, vjust = -0.5, hjust = 0, size = 2.7
+  ) +
+  labs(
+    title = "Évolution des tags - Toutes années\n+ jeu le plus possédé chaque année ",
+    x = "Année de sortie",
+    y = "Nombre de jeux sortis",
+    color = "Tag"
+  ) +
+  theme_minimal(base_size = 10)
+  
 # --- Graphique 1 : avant ou en 2013 ---
 ggplot(genre_year_pre2013_top, aes(x = year, y = n, color = tag)) +
   geom_line(linewidth = 1.1) +
@@ -1837,27 +1862,21 @@ ggplot(genre_year_post2013_top, aes(x = year, y = n, color = tag)) +
   ) +
   theme_minimal(base_size = 10)
 
-# --- Graphique 3 : global ---
-ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
-  geom_line(linewidth = 1.1) +
-  geom_point(size = 1.6) +
-  geom_vline(
-    data = top_game_all_label, 
-    aes(xintercept = year), 
-    linetype = "dotted", color = "black", linewidth = 0.6
-  ) +
-  geom_text(
-    data = top_game_all_label,
-    aes(x = year, y = y_max, label = stringr::str_trunc(name, 15, "right")),
-    color = "black",
-    angle = 90, vjust = -0.5, hjust = 0, size = 2.7
-  ) +
-  labs(
-    title = "Évolution des tags - Toutes années\n+ jeu le plus possédé chaque année ",
-    x = "Année de sortie",
-    y = "Nombre de jeux sortis",
-    color = "Tag"
-  ) +
-  theme_minimal(base_size = 10)
+
 
 ```
+
+### Interprétation
+On se concentrera sur les 2 grpahiques de focus sur les périodes avant et après 2013. 
+Ici on voit apparaitre le best seller de l'année. On peut donc estimer si le jeu en question à une relation avec les jeux sorties cette année. 
+
+Par exemple certain jeux n'ont rien à voir avec les "gros" tags des jeux sorties cette année là. Par exemple Left 4 dead 1 et 2 en 2008 et 2009 se retrouve uniquement dans 2 tags (Action et multiplayer). On pourrait donc estimer que c'est un bon jeux malgré qu'il n'ai pas forcément surfer sur la vague du moment. 
+En revanche si on regarde Trove en 2015, il coche toute les cases de plusieurs des meilleur tags (3D, action, adventure, casual). 
+
+### Limites et attentions
+
+Il faut absolument garder en tête que le dataset ne se base pas sur tout l'historique de steam mais bien sur une journée ce qui peut donc ne pas être représentatif à la perfection.
+
+Les résultat présents sont limités par le fait que beaucoup de jeux peuvent avoir plusieurs tags et donc compter plusieurs fois et biaiser les résultat. Ici impossible de faire la distcntion car il n'y a pas de hiérarchisation des tags. Néamoins une possibilité pourrait être de donner un poids aà certains tags trop générique pour observer des résultat plus axé sur le theme du jeux en lui même (military plutot que multiplayer)
+
+Nous sommes également limité par l'explicité des tags, par exemple, Coop online est-il réservé au jeux qui proposent un matchmaking ou aux jeux permettant d'invité ses amis ou les deux. Ces petites imprécision affecte également la pertinence de l'analyse.
