@@ -710,6 +710,7 @@ head(games_languages)
 
 ```{r filter_tags}
 games_price$app_id <- as.character(games_price$app_id)
+tags$app_id <- as.character(tags$app_id)
 
 merged_tags <- games_price %>%
   filter(is_free == 0, price >= 20) %>%
