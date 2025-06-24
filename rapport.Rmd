@@ -1539,7 +1539,7 @@ ggplot(tag_players,
          labs(title = "Meilleur tag de l'année", 
               x = NULL,
               y = "joueur connecté a la création du dataset") + 
-         theme_minimal()
+         steam_theme 
 ```
 
 ### Interprétation
@@ -1589,13 +1589,14 @@ top50_cat <- cat_pop_long %>% slice_max(total_owner_min, n = 20)
 
 # Affichage du graphique avec catégories en abscisse
 ggplot(top50_cat, aes(x = reorder(categories, total_owner_min), y = total_owner_min)) +
-  geom_col(width = 0.3, fill = "blue") +
+  geom_col(width = 0.3, fill = primary_color) +
   labs(
     title = "Top 50 des catégories Steam par nombre minimal de possesseurs",
     x = "Catégorie",
     y = "Somme des bornes minimales de possesseurs"
   ) +
   scale_y_continuous(labels = comma) +  # <--- C'est cette ligne qui enlève les exposants
+  steam_theme +
   theme_minimal(base_size = 10) +
   theme(
     axis.text.x = element_text(angle = 75, hjust = 1, size = 7),
@@ -1651,6 +1652,7 @@ ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
     y = "Nombre de jeux sortis",
     color = "Tag"
   ) +
+  steam_theme +
   theme_minimal(base_size = 10)
 
 ## 2. Jeux sortis avant ou en 2015 (top 10 tags)
@@ -1676,7 +1678,8 @@ ggplot(genre_year_pre2015_top, aes(x = year, y = n, color = tag)) +
     y = "Nombre de jeux sortis",
     color = "Tag"
   ) +
-  theme_minimal(base_size = 10)
+  
+  steam_theme
 
 ## 3. Jeux sortis après 2013 
 games_tags_post2015 <- games_tags %>% filter(year > 2013)
@@ -1701,7 +1704,7 @@ ggplot(genre_year_post2015_top, aes(x = year, y = n, color = tag)) +
     y = "Nombre de jeux sortis",
     color = "Tag"
   ) +
-  theme_minimal(base_size = 10)
+  steam_theme 
 
 
 ```
@@ -1815,7 +1818,7 @@ ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
     y = "Nombre de jeux sortis",
     color = "Tag"
   ) +
-  theme_minimal(base_size = 10)
+  steam_theme 
   
 # --- Graphique 1 : avant ou en 2013 ---
 ggplot(genre_year_pre2013_top, aes(x = year, y = n, color = tag)) +
@@ -1838,7 +1841,7 @@ ggplot(genre_year_pre2013_top, aes(x = year, y = n, color = tag)) +
     y = "Nombre de jeux sortis",
     color = "Tag"
   ) +
-  theme_minimal(base_size = 10)
+  steam_theme 
 
 # --- Graphique 2 : après 2013 ---
 ggplot(genre_year_post2013_top, aes(x = year, y = n, color = tag)) +
@@ -1861,7 +1864,7 @@ ggplot(genre_year_post2013_top, aes(x = year, y = n, color = tag)) +
     y = "Nombre de jeux sortis",
     color = "Tag"
   ) +
-  theme_minimal(base_size = 10)
+  steam_theme
 
 
 
