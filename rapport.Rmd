@@ -10,7 +10,7 @@ editor_options:
     wrap: sentence
 ---
 
-```{r setup, include=FALSE}
+```{r Setup, include=FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,
   message = FALSE, 
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ```
 
-```{r library importation}
+```{r Import des librairies}
 # Importation des library
 library(scales)
 library(lubridate)
@@ -30,7 +30,7 @@ library(knitr)
 library(treemapify)
 ```
 
-```{r configuration style}
+```{r Configuration du style global}
 # Ce chunck permet de configurer le style de l'ensemble des visualisations
 
 # Choix du font/police d'écriture
@@ -99,7 +99,7 @@ steam_theme <- theme_minimal(base_family = primary_font) +
 Steam est une plateforme de distribution de jeux vidéo développée par Valve.
 
 Elle permet aux utilisateurs d’acheter, télécharger et jouer à une grande variété de jeux sur PC, Mac et Linux.
-En plus de proposer un vaste catalogue de jeux (environ 140 000 jeux), Steam offre des évaluations et avis de joueurs sur les jeux de son catalogue.
+En plus de proposer un vaste catalogue de jeux (environ 140 000), Steam permet d'évaluer et de donner son avis sur son expérience expérience de jeu.
 
 ![](img/store_home_share.jpg)
 
@@ -209,7 +209,7 @@ Voici une liste non exhaustive des variables comparées ainsi que les visualisat
 
 ------------------------------------------------------------------------
 
-```{r import dataset}
+```{r Import du dataset}
 
 # Utilisé par Paul
 reviews <- read_csv("data/raw_reviews.csv") %>%
@@ -291,7 +291,7 @@ games <- read_delim("./data/clean_games.csv", delim=";", show_col_types = FALSE)
 steamspy <- read_csv("data/steamspy.csv")
 ```
 
-# Analyse descriptive
+## Analyse descriptive
 
 Dans cette partie, nous allons chercher à analyser les différentes variables de notre dataset importé afin d'appréhender les données que nous avons choisis.
 Nous chercherons à calculer les moyennes et les écarts-types des variables numériques (pour le prix, le nombre d'avis, etc...).
@@ -300,7 +300,7 @@ Enfin, nous construirons également une matrice de corrélation afin d'examiner 
 
 ## Moyennes et Écarts-types
 
-```{r mean_and_sd}
+```{r Moyennes et Écarts-types}
 # Variables pertinents pour la moyenne et l'écart-type
 steamSummarise = steamData %>%
   summarise(
@@ -347,16 +347,16 @@ tableau_stat <- df_long %>%
 kable(tableau_stat, col.names = c("Variable", "Moyenne", "Ecart-Type"), caption = "Statistiques descriptives des principales variables", digits = 2)
 ```
 
-### Notes :
+### Notes
 
--   La moyenne des notes Metacritics ne concerne que les jeux ayant reçu cette note
--   La moyenne des prix ne concerne uniquement les jeux payants
+-   La moyenne des notes Metacritics ne concerne que les jeux ayant reçu cette note.
+-   La moyenne des prix concerne uniquement les jeux payants.
 
 ## Répartition de différentes variables
 
 ### Répartition de la plage de propriétaires des jeux Steam
 
-```{r owner_count_repartition}
+```{r Répartition des propriétaires}
 # Compter le nombre de jeux par plage de propriétaires
 owners_count <- steamData %>%
   group_by(owners_range) %>%
@@ -424,13 +424,13 @@ ggplot(owners_count_clean, aes(x = nb_jeux, y = owners_range_short)) +
   coord_cartesian(clip = "off")
 ```
 
-### Note :
+### Note
 
--   Ces données proviennent de SteamSpy. Un autre outil existe pour estimer le nombre de copies vendues au total (Gamalytic), mais ce service est payant
+-   Ces données proviennent de SteamSpy. Un autre outil existe pour estimer le nombre de copies vendues au total (Gamalytic), mais ce service est payant.
 
 ### Répartition des jeux Steam sortis par année
 
-```{r jeux_par_annee}
+```{r Jeux par année}
 # Extraire l'année et compter les jeux par année
 jeux_par_annee <- steamData %>%
   mutate(annee_sortie = lubridate::year(release_date)) %>%
@@ -440,7 +440,7 @@ jeux_par_annee <- steamData %>%
   arrange(annee_sortie)
 ```
 
-```{r game_released_by_year_log}
+```{r Jeux sortis par année (pseudo-log)}
 ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
   geom_col(fill = primary_color) +
   scale_x_continuous(breaks = pretty(jeux_par_annee$annee_sortie, n = 10)) +
@@ -462,9 +462,9 @@ ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
 -   On observe l'absence de jeux sortis en 2002.
 -   On observe également **une augmentation nette** à partir de **2006**. Une explication plausible est que la plateforme Steam est sortie en 2003 et était dédiée à la distribution des mises à jour des jeux Valve. Ce n'est qu'à la fin de l'année 2005 que Steam a décidé de distribuer des jeux tiers sur son marché.
 -   On observe une **augmentation brusque** en **2013-2014**. Ceci est le résultat du programme **Steam Greenlight**, un service qui permettait aux développeurs de soumettre leur jeu pour que la communauté Steam puisse voter pour ceux qui vont intégrer le catalogue de la plateforme. Lancé en 2012, ce service va permettre à plus en plus de jeux de pouvoir intégrer le catalogue Steam.
--   Il faut prendre en compte également que ce graphique utilise une échelle pseudo-logarithmique, lorsque l'on parlons d'augmentation nette, elle ne l'est pas réellement en terme de chiffre. On vous affiche le graphique réel sans échelle logarithmique :
+-   Il faut prendre en compte également que ce graphique utilise une échelle pseudo-logarithmique, lorsque nous parlons d'augmentation nette, elle ne l'est pas réellement en terme de chiffre. On vous affiche le graphique réel sans échelle logarithmique :
 
-```{r game_released_by_year}
+```{r Jeux sortis par année}
 ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
   geom_col(fill = primary_color) +
   scale_x_continuous(breaks = pretty(jeux_par_annee$annee_sortie, n = 10)) +
@@ -485,7 +485,7 @@ ggplot(jeux_par_annee, aes(x = annee_sortie, y = nb_jeux)) +
 
 ### Répartition des genres des jeux Steam
 
-```{r genres}
+```{r Genres des jeux}
 # Séparer les genres (s'ils sont séparés par des virgules), enlever les espaces, et compter
 genres_par_jeu <- steamData %>%
   filter(!is.na(genres)) %>%
@@ -510,18 +510,18 @@ genres_par_jeu %>%
   steam_theme
 ```
 
-### Observations :
+### Observations
 
--   Le genre le plus populaire dans le catalogue Steam est le genre `Indie`
--   On peut observer ensuite un nombre similaire pour les genres `Action` `Casual` et `Adventure` (\~ 36k jeux) et pour les genres `Simulation`, `Strategy` et `RPG` (\~ 17k jeux)
+-   Le genre le plus populaire dans le catalogue Steam est le genre `Indie`.
+-   On peut observer ensuite un nombre similaire pour les genres `Action` `Casual` et `Adventure` (\~ 36k jeux) et pour les genres `Simulation`, `Strategy` et `RPG` (\~ 17k jeux).
 
-### Note :
+### Note
 
--   Nous avons retiré les genres qui ne comptaient moins de 1000 jeux pour se concentrer sur les genres principaux des jeux Steam. La plupart des autres genres retirés étaient des genres de niche (Cinéma ou d'autres genres concernant les logiciels disponibles sur Steam).
+-   Nous avons retiré les genres qui comptaient moins de 1000 jeux pour se concentrer sur les principaux. La plupart des genres retirés étaient de niche (Cinéma ou les logiciels disponibles sur Steam).
 
 ## Matrice de corrélation
 
-```{r correlation_matrix, dev.args = list(bg = background_color)}
+```{r Matrice de corrélation, dev.args = list(bg = background_color)}
 # Matrice de corrélation
 numeric_cols <- steamData %>%
   select(
@@ -611,25 +611,25 @@ ggplot(cor_long, aes(x = x, y = y)) +
   coord_fixed(ratio = 1)
 ```
 
-### Observations :
+### Observations
 
--   Le nombre d'avis positif semble être corrélé avec le nombre de recommendation (0.93)
--   La note Metacritic n'est pas forcément corrélé avec la proportion de notes positives (0.53)
--   Certaines valeurs obtenues doivent être discutées comme la corrélation entre le nombre de recommendation et le nombre d'avis positive/négative. En effet, comme il s'agit d'une valeur comptée, cela peut biaiser l'interprétation de la corrélation. En prenant en compte la proportion, nous obtenons une valeur quasi-nulle.
+-   Le nombre d'avis positifs semble être corrélé avec le nombre de recommandations (0.93).
+-   La note Metacritic n'est pas forcément corrélée avec la proportion de notes positives (0.53).
+-   Certaines valeurs obtenues doivent être discutées comme la corrélation entre le nombre de recommandations et le nombre d'avis positifs/négatifs. En effet, comme il s'agit d'une valeur comptée, cela peut biaiser l'interprétation de la corrélation. En prenant en compte la proportion, nous obtenons une valeur quasi-nulle.
 
-### Notes :
+### Notes
 
--   Il n'existe pas de corrélation négative dans nos données
--   Nous avons omis la proportion d'avis négative dans le tableau car nous obtenons juste le résultat inverse que pour la corrélation pour les avis positive.
+-   Il n'existe pas de corrélation négative dans nos données.
+-   Nous avons omis la proportion d'avis négatifs dans le tableau car nous obtenons juste le résultat inverse que pour la corrélation pour les avis positifs.
 
 ------------------------------------------------------------------------
 
-# Partie Analyse Prix
+# Analyse des prix
 
 ## Contexte et problématique
 
 Dans cette section, nous allons nous intéresser aux différents facteurs qui peuvent avoir une influence sur le prix des jeux du dataset.
-Nous avons à partir des données de notre jeu de données relevé différents aspects qui seraient intéressants d'analyser afin de mieux comprendre comment peut être défini le prix d'un jeu.
+Nous avons, à partir des données de notre jeu de données, relevé différents aspects qui seraient intéressants d'analyser afin de mieux comprendre comment peut être défini le prix d'un jeu.
 
 Dans chaque sous-section de cette partie, nous expliquerons qu'est-ce que nous analysons et pourquoi.
 Ensuite, nous montrerons les graphiques puis les analyserons, pour enfin en donner une conclusion ainsi que les limites de cette analyse.
@@ -637,13 +637,12 @@ Ensuite, nous montrerons les graphiques puis les analyserons, pour enfin en donn
 ### Préparation des données
 
 Avant de passer à l'analyse, nous devons d'abord traiter et filtrer nos données afin d'obtenir nos visualisations.
-Nous avons fait le choix de laisser les différentes parties de codes pour les traitements des données uniquement visible depuis le fichier Rmarkdown (avec explication en commentaires) et non sur le rapport "exporté" (au format HTML).
+Nous avons fait le choix de laisser les différentes parties de codes pour les traitements de données uniquement visibles depuis le fichier Rmarkdown (avec explication en commentaires) et non sur le rapport "exporté" (au format HTML).
 
 Nous avons fait ce choix car le rapport a pour but d'analyser et d'observer nos jeux de données et non d'expliquer comment faire tel ou tel graphique.
 
-```{r filter_price}
+```{r Filtrage des prix}
 # Filtrage des données pour n'obtenir que les jeux payant (exclu les jeux F2P et les jeux où on n'a pas de données sur le prix)
-
 print(paste0("Nombre total de lignes du dataframe : ", nrow(games)))
 
 games_price <- games %>% filter(is_free == 0)
@@ -653,14 +652,12 @@ games_price <- games_price %>% filter(!is.na(price))
 print(paste0("Nombre de lignes sans les F2P + erreurs de données : ", nrow(games_price)))
 
 # Filtrage des données pour garder que les prix en EURO qui représente l'écrasante majorité (~ 99%)
-
 games_price <- games_price %>% filter(currency == "EUR")
 print(paste0("Nombre de lignes avec uniquement les jeux en EURO : ", nrow(games_price)))
 ```
 
-```{r filter_for_price_evolution_part}
+```{r Filtrage des prix 2}
 # Ajoute une colonne pour la date de l'année, pour ensuite groupé par année et calculer la moyenne
-
 games_evolve <- games_price %>%
   mutate(release_year = year(release_date)) %>%
   filter(price >= 15)
@@ -671,7 +668,6 @@ price_by_year <- games_evolve %>%
   arrange(release_year)
 
 # Separate indie and studio games to analyse their evolution separately
-
 indie_games <- tags %>%
   filter(tag == "Indie")
 
@@ -692,14 +688,12 @@ price_by_year_indie_and_studio <- games_indie_and_studio %>%
   arrange(release_year)
 ```
 
-```{r filter_for_languages_evolution_part}
+```{r Filtrage des prix 3}
 # Filtrage des données où il n'y a pas d'information sur les langues disponibles
-
 games_languages <- games_price %>% filter(!is.na(languages))
 print(paste0("Nombre de lignes sans les jeux avec aucune information sur les langues : ", nrow(games_languages)))
 
 # Traitement des données pour compter le nombre de langues par jeu et le rajouter dans une nouvelle colonne 'nb_languages'
-
 games_languages <- games_languages %>%
   mutate(
     nb_languages = str_split(languages, ",") %>% map_int(~ length(.x))
@@ -708,7 +702,7 @@ games_languages <- games_languages %>%
 head(games_languages)
 ```
 
-```{r filter_tags}
+```{r Filtrage des tags}
 games_price$app_id <- as.character(games_price$app_id)
 tags$app_id <- as.character(tags$app_id)
 
@@ -717,7 +711,6 @@ merged_tags <- games_price %>%
   inner_join(tags, by = "app_id")
 
 # On compte les occurences des tags pour sélectionner les 50 plus fréquents
-
 tag_counts <- merged_tags %>%
   group_by(tag) %>%
   summarise(n = n(), .groups = "drop") %>%
@@ -740,15 +733,15 @@ median_price_top_50 <- median_price_by_tag %>%
 
 ## L'évolution des prix des jeux au fil du temps
 
-Tout d'abord, nous allons nous intéresser à l'évolution des prix au fil des années. Nous avons décidé de commencer par là car en tant que joueur, nous avons tous l'impression que durant les années le prix des jeux n'a cessé d'augmenter. Encore aujourd'hui, c'est en plein dans l'actualité avec la sortie de la console de Nintendo : la Switch 2 et ses prix aux alentours des 80~90€.
+Tout d'abord, nous allons nous intéresser à l'évolution des prix au fil des années. Nous avons décidé de commencer par là car en tant que joueur, nous avons tous l'impression que durant les années le prix des jeux n'a cessé d'augmenter. Encore aujourd'hui, c'est d'actualité avec la sortie de la nouvelle console de Nintendo, la Switch 2, avec ses jeux aux alentours des 80~90€.
 
-Il nous pense donc intéressant de voir si ce phénomène s'illustre à travers notre jeu de données.
+Nous pensons qu'il est intéressant de voir si ce phénomène s'illustre à travers notre jeu de données.
 
 ### Visualisation
 
 Voici en premier lieu, un graphique "scalar plot" montrant avec les années sur l'axe horizontal et le prix moyen des jeux de notre dataset sur l'axe vertical.
 
-```{r graph_global_price_evolution}
+```{r Graphique global de l\'évolution des prix}
 # Tracer les deux courbes
 ggplot(price_by_year, aes(x = release_year, y = mean_price)) +
   geom_line(color = "#1A9FFF", size = 1) +
@@ -760,11 +753,11 @@ ggplot(price_by_year, aes(x = release_year, y = mean_price)) +
   steam_theme
 ```
 
-Le second graphique lui, montre la même évolution mais cette fois-ci en distinguant les jeux indépendants des jeux de studios généralement à plus gros budget (AAA, AA, ..).
+Le second graphique, lui, montre la même évolution mais cette fois-ci en distinguant les jeux indépendants des jeux de studios généralement à plus gros budget (AAA, AA, ..).
 
-Nous avons voulu les séparer car c'est deux secteurs sont bien différents que ce soit leur manière de développer, leur budget, leur objectifs, ... De plus, nous aovns pris cette décision car dans de nombreux autres analyse dans ce rapport nous avons noté des différences entre les deux.
+Nous avons voulu les séparer car ce sont deux secteurs bien différents, que ce soit dans leur manière de développer, leur budget, leurs objectifs, ...
 
-```{r graph_indie_vs_studio_price_evolution}
+```{r Graphique de l\'évolution des prix entre les jeux indés et studio}
 # 1. Filtrer les jeux avec type de jeu connu (pas de NA)
 ggplot(price_by_year_indie_and_studio, aes(x = release_year, y = mean_price, color = tag)) +
   geom_line(size = 1.2) +
@@ -783,21 +776,21 @@ ggplot(price_by_year_indie_and_studio, aes(x = release_year, y = mean_price, col
 
 Globalement, on observe effectivement qu'il y a bien une tendance haussière du prix des jeux vidéos, en tout cas, sur le catalogue Steam.
 
-Néanmoins, à travers le second graphique, on peut constater que la hausse des prix des jeux 'Studio' est bien plus grande que celle des jeux indépendants. Cette tendance correspond toute à fait aux observations que nous ferons plus tard dans le rapport.
+Néanmoins, à travers le second graphique, on peut constater que la hausse des prix des jeux 'Studio' est bien plus grande que celle des jeux indépendants. Cette tendance correspond tout à fait aux observations que nous ferons plus tard dans le rapport.
 
-Enfin, on peut très clairement distinguer une forte croissance pour les jeux 'Studio' aux alentours de 2012~2013. Nous n'avons malheuresement pas réussi à déterminer exactement la cause de cette croissance. Nous avons notamment pensé à la sortie d'une nouvelle génération de console avec la PS4 et la XBOX One sortie fin 2013, mais néanmoins, nous n'avons pas observé de différence de prix majeures entre les nouveaux jeux et ceux précédent (sur PS3 et XBOX 360).
+Enfin, on peut très clairement distinguer une forte croissance pour les jeux 'Studio' aux alentours de 2012~2013. Nous n'avons malheuresement pas réussi à déterminer exactement la cause de cette croissance. Nous avons notamment pensé à la sortie d'une nouvelle génération de consoles avec la PS4 et la XBOX One sorties fin 2013, mais néanmoins, nous n'avons pas observé une différence de prix majeure entre les nouveaux jeux et ceux d'avant (sur PS3 et XBOX 360).
 
 ## La disparité de genres de jeux vidéo
 
-Pour continuer, nous allons maintenant essayer de voir quel pourrait-être les possibles liaisons entre les genres de jeux-vidéo et leur prix. Il nous paraît en effet tout à fait cohérent qu'un jeu 3D open-world type : GTA V, The Witcher III coûte plus chère qu'un jeu comme un super mario 2D plateformer (m'enfin ça c'est mal connaître Nintendo hein 👀).
+Pour continuer, nous allons maintenant essayer de déterminer les liens entre les genres des jeux vidéo et leurs prix. Il nous paraît en effet tout à fait cohérent qu'un jeu 3D open-world comme GTA V ou The Witcher III coûte plus cher qu'un jeu comme un Super Mario 2D plateformer (m'enfin ça c'est mal connaître Nintendo hein 👀).
 
-Nous allons donc voir à travers cette section, quels sont les genres de jeux les plus et moins chères. Essayer de comprendre pourquoi et analyser et comparer plus en détails certains genres entre eux.
+Nous allons donc voir à travers cette section, quels sont les genres de jeux les plus et moins chers. Nous voulons essayer de comprendre pourquoi, puis analyser et comparer plus en détails certains genres entre eux.
 
 ### Visualisation
 
 Voici une treemap montrant les 50 genres de jeux vidéos les plus fréquents de notre dataset avec le dégradé de couleur indiquant le prix médian par genre.
 
-```{r treemap_genres}
+```{r Graphique treemap des genres}
 ggplot(median_price_top_50, aes(area = median_price, label = tag, fill = median_price)) +
   geom_treemap() +
   geom_treemap_text(colour = "white", place = "centre", grow = FALSE, reflow = FALSE) +
@@ -812,11 +805,11 @@ ggplot(median_price_top_50, aes(area = median_price, label = tag, fill = median_
 
 Nous parlerons du graphique treemap dans la partie observations.
 
-Ce qui nous intéresse ici c'est de mettre le focus sur un genre en particulier : la VR (réalité virtuelle). En effet, celle ci est très récente dans le marché du jeu vidéo. Nous avons donc voulu savoir quel était l'évolution de cette catégorie du jeu depuis sa démocratisation.
+Ce qui nous intéresse ici c'est de mettre le focus sur un genre en particulier : la VR (réalité virtuelle). En effet, celle-ci est très récente dans le marché du jeu vidéo. Nous avons donc voulu savoir quel était l'évolution de cette catégorie depuis son apparition.
 
-Pour cela, nous avons fait un bar plot montrant le nombre de jeux VR sortie par année.
+Pour cela, nous avons fait un bar plot montrant le nombre de jeux VR sortis par année.
 
-```{r vr_games_released}
+```{r Sorties des jeux VR}
 vr_games_by_year <- merged_tags %>%
   filter(tag == "VR") %>%
   mutate(release_year = year(release_date)) %>%
@@ -834,7 +827,7 @@ ggplot(vr_games_by_year, aes(x = release_year, y = nb_jeux)) +
 
 Puis, nous avons également fait un scalar plot pour suivre le prix des jeux VR médians au fil des années.
 
-```{r vr_games_price}
+```{r Prix des jeux VR}
 median_price_vr_by_year <- merged_tags %>%
   filter(tag == "VR") %>%
   mutate(release_year = year(release_date)) %>%
@@ -853,27 +846,26 @@ ggplot(median_price_vr_by_year, aes(x = release_year, y = median_price)) +
 
 ### Observations
 
-Concernant la partie des jeux VR, On observe aisément une corrélation entre la chute des prix des jeux VR et leur démocratisation dans le marché. Cela nous parait parfaitement cohérent. Au fur et à mesure que les technologies ont évolués, et qu'il est devenu plus facile à la fois pour les développeurs de créer des jeux VR mais aussi l'accessibilité des joueurs (sortie en 2016 du premier Occulus Rift), le nombre de jeux a pu augmenter et leur prix diminué. Nous avons donc ici, selon nous, un exemple de facteur qui impacte grandement les prix des jeux : la difficulté à développer un type spécifique et innovant de jeu vidéo.
+Concernant les jeux en réalité virtuelle (VR), on observe clairement une corrélation entre la baisse des prix et leur démocratisation sur le marché. Cela nous paraît parfaitement cohérent. Au fur et à mesure que les technologies ont évolué, et qu’il est devenu plus facile, à la fois pour les développeurs de créer des jeux VR et pour les joueurs d’y accéder (avec la sortie du premier Oculus Rift en 2016), le nombre de jeux a pu augmenter tandis que leur prix diminuait. Nous avons donc ici, selon nous, un exemple de facteur ayant un impact significatif sur les prix des jeux : la complexité liée au développement d’un type de jeu vidéo spécifique et innovant.
 
-Et ce critère semble ce poursuivre avec le premier graphique (la treemap), on observe par exemple que les jeux 3D coûtent plus hcères que les jeux 2D. De plus, le genre le plus chères est le : JRPG. Cela nous paraît également cohérent étant donnée l'état du marché des jeux vidéos actuel. Aujourd'hui, les gros jeux (à grosse production) possèdent très souvent ce tag.
+Ce critère semble également se confirmer avec le premier graphique (la treemap) : on observe, par exemple, que les jeux en 3D coûtent plus cher que les jeux en 2D. De plus, le genre le plus cher est le JRPG. Cela nous paraît également cohérent, étant donné l’état actuel du marché du jeu vidéo. Aujourd’hui, les jeux à gros budget (ou productions AAA) possèdent très souvent ce tag.
 
-A l'inverse, la treemap confirme également la tendance qu'on a observé dans la partie évolution du prix au fil du temps. On observe que les jeux Indie (jeux indépendants) sont en général bien moins chères que les autres.
+À l’inverse, la treemap confirme également la tendance observée dans la partie sur l’évolution des prix au fil du temps : les jeux indie (jeux indépendants) sont, en général, bien moins chers que les autres.
 
 ## Les langues disponibles sur les jeux vidéos
 
-Nous allons maintenant analyser est-ce que les langues disponibles pour un jeu peut avoir un impact sur son prix.
+Nous allons maintenant analyser si les langues disponibles pour un jeu peut avoir un impact sur son prix.
 
-Nous avons choisi d'étudier cet aspect là car traduire un jeu dans une langue demande un travail supplémentaire pour le studio de développement qui doit soit embaucher des employés pour chaque langue souhaitée, soit faire appel à des équipes de traductions externes à l'entreprise.
-De plus, cette traduction demande parfois des adaptations visuelles d'éléments graphiques directement dans le jeu, par exemple : si les langues sont extrêmement différentes (langues asiatiques fonctionnant sur un système d'idéogrammes et langues occidentales se basant sur l'alphabet latin).
+Nous avons choisi d'étudier cet aspect, car traduire un jeu dans une autre langue représente un travail supplémentaire pour le studio de développement. Celui-ci doit soit embaucher des employés pour chaque langue souhaitée, soit faire appel à des équipes de traduction externes à l’entreprise. De plus, la traduction peut parfois nécessiter des adaptations visuelles d’éléments graphiques directement dans le jeu. C’est notamment le cas lorsque les langues sont très différentes, comme entre les langues asiatiques, qui utilisent des idéogrammes, et les langues occidentales, fondées sur l’alphabet latin.
 
 Ainsi, cela représente un coût supplémentaire à ajouter au développement et ceci pour chaque langue.
-Voila pourquoi nous pensons nous intéressr à ce sujet.
+Voila pourquoi nous pensons qu'il est utile de se pencher sur ce sujet.
 
 ### Visualisation
 
-Nous décidons de partir sur un "scalar plot" avec comme axe horizontal le prix des jeux et comme axe vertical le nombre de langues disponibles :
+Nous avons décidé de partir sur un "scalar plot" avec comme axe horizontal le prix des jeux et comme axe vertical le nombre de langues disponibles :
 
-```{r languages_graph}
+```{r Graphique entre les prix des jeux et les langues disponibles}
 ggplot(games_languages, aes(x = price, y = nb_languages)) +
   geom_point(color = "#1A9FFF", alpha = 0.5) +
   labs(title = "Corrélation entre le Prix des jeux et le nombre de Langues disponibles",
@@ -883,11 +875,11 @@ ggplot(games_languages, aes(x = price, y = nb_languages)) +
   steam_theme
 ```
 
-Comme vous pouvez le constater le graphique est très peu lisible à cause de ses échelles, cela est dû aux points dits "outlier" : des points extrêmes en prix ou nombre de langues relevant "d'anomalie" et ne représentant pas la masse des données.
+Comme vous pouvez le constater, le graphique est difficilement lisible en raison de ses échelles. Cela s’explique par la présence de points dits outliers : des valeurs extrêmes en termes de prix ou de nombre de langues, considérées comme des anomalies et ne représentant pas la majorité des données.
 
-Nous décidons donc de les enlever pour réduire l'échelle et mieux pouvoir analyser le graphique.
+Nous avons donc décidé de les retirer afin de réduire l’échelle et d’analyser le graphique plus efficacement.
 
-```{r languages_graph_2}
+```{r Graphique 2 entre les prix des jeux et les langues disponibles}
 games_languages <- games_languages %>% filter(nb_languages < 50) %>% filter(price <= 100)
 
 ggplot(games_languages, aes(x = price, y = nb_languages)) +
@@ -901,7 +893,7 @@ ggplot(games_languages, aes(x = price, y = nb_languages)) +
 
 ### Observations
 
-Comme nous pouvons l'observer, de nombreux jeux possédant le même nombre de langues se vendent à des prix très différents et inversement de nombreux jeux aux mêmes prix possèdent un nombre de langues très différents.
+Comme nous pouvons l'observer, de nombreux jeux qui possèdent le même nombre de langues se vendent à des prix très différents et inversement de nombreux jeux aux mêmes prix possèdent un nombre de langues très différents.
 De plus, nous n'observons pas d'augmentation de prix de façon linéaire par rapport au nombre de langues disponibles.
 
 **Il ne semble donc pas y avoir de corrélation entre le nombre de langues disponibles et le prix d'un jeu.**
@@ -911,27 +903,27 @@ Cela nous parraît cohérent étant donné qu'aujourd'hui le support multi-langu
 Les studios aujourd'hui visent un marché international et donc doivent rendre leurs jeux accessibles pour ces marchés.
 
 Pour revenir sur les points "outliers" du premier graphique, on peut observer que les points tout en haut à gauche sont trop nombrés et regroupés pour être qualifiés de simple outliers.
-Après investigation dans les jeux de données, nous avons découvert qu'il s'agit principalement de petit jeux à puzlle où il n'y a aucun ou très peu de texte.
+Après investigation dans les jeux de données, nous avons découvert qu'il s'agit principalement de petits jeux à puzzle où il n'y a aucun ou très peu de texte.
 Par ailleurs, on peut observer une sorte de barrière auquel se rencontre les jeux un peu après 100 langues.
 Cette barrière (103 pour être précis) représente en réalité le nombre de langues que reconnaît Steam.
 Ainsi, ces jeux indiquent qui valident toutes les langues car ils n'ont justement pas de traduction à faire pour leur jeu.
 
-```{r nb_languages_superior_to_100}
+```{r Récupération des jeux avec plus de 100 langues}
 languages_100 <- games_languages %>% filter(nb_languages >= 100)
 head(languages_100)
 ```
 
 ## Limites de l'analyse sur les prix
 
-Concernant cette partie analyse de prix, nous avons identifié 2 principales limites qui peuvent nuire à nos résultats.
+Concernant cette partie sur l'analyse de prix, nous avons identifié 2 principales limites qui peuvent nuire à nos résultats.
 
-La première, la plus évidente, c'est que nos données contiennent uniquement les jeux sur Steam. Ainsi, sur un sujet comme le prix des jeux qui est très soumis au variation du marché des jeux vidéos, cela est dommage de ne pas avoir avoir plus de données. A cause de cela, de nombreux jeux n'aparraissent pas dans ce dataset mais participe tout autant à ce marché et donc impacte les prix.
+La première, la plus évidente, c'est que nos données contiennent uniquement les jeux sur Steam. Ainsi, sur un sujet comme le prix des jeux qui est très soumis aux variations du marché des jeux vidéos, cela est dommage de ne pas avoir avoir plus de données. A cause de cela, de nombreux jeux n'apparaissent pas dans ce dataset mais participent tout autant à ce marché et donc impactent les prix.
 
-L'autre limite concerne nos données, aujourd'hui en 2025 le prix du jeu n'est plus du tout le seul moyen pour les développeurs de rentabiliser leurs jeux. Les micro-transactions avec les achats intégrés dans les jeux ou encore les DLC (extension d'un jeu payant) sont des stratégies aujourd'hui largement déployé. Malheuresement, nos datasets ne disposent pas de ces données (impossible à récupérer depuis les interfaces ou outils de Steam).
+L'autre limite qui concerne nos données est qu'aujourd'hui en 2025 le prix du jeu n'est plus du tout le seul moyen pour les développeurs de rentabiliser leurs jeux. Les micro-transactions avec les achats intégrés ou encore les DLC (extension d'un jeu payant) sont des stratégies aujourd'hui largement déployées. Malheuresement, nos datasets ne disposent pas de ces données (impossible à récupérer depuis les interfaces ou outils de Steam).
 
 ### ------------------------------------------------------------------------
 
-## Types de jeux en ligne sur Steam
+# Types de jeux en ligne
 
 ### Différences entre Catégorie et Tag
 
@@ -984,7 +976,7 @@ On utilise le nombre de joueurs actifs en octobre 2024 (`concurrent_users_yester
 
 ### Types de jeux en ligne
 
-Pour analyser les type de jeux les plus populaires pour les jeux en ligne et regarder sa distribution dans le magasin Steam, on a retenu les tags suivants uniquement :
+Pour analyser les types de jeux les plus populaires pour les jeux en ligne et regarder sa distribution dans le magasin Steam, on a retenu les tags suivants uniquement :
 
 -   FPS Multijoueur
 -   Battle Royale
@@ -994,7 +986,7 @@ Pour analyser les type de jeux les plus populaires pour les jeux en ligne et reg
 -   Survival Multiplayer
 -   Autres (correspondant aux autres tags non classés)
 
-```{r get_infos_online_games, include=FALSE}
+```{r Récupération des informations des jeux en ligne, include=FALSE}
 # Détecter les jeux multijoueurs
 jeux_en_ligne <- steamData %>%
   filter(
@@ -1033,7 +1025,7 @@ popularite_types <- jeux_en_ligne_type %>%
 
 Voici la répartition des joueurs sur la plateforme Steam sur les jeux en lignes :
 
-```{r barchart, fig.align='center'}
+```{r Barchart des joueurs actifs par type de jeu, fig.align='center'}
 ggplot(popularite_types, aes(x = reorder(type_de_jeu, total_joueurs_actifs), y = total_joueurs_actifs, fill = type_de_jeu)) +
   geom_col(show.legend = FALSE) +
   coord_flip() +
@@ -1068,7 +1060,7 @@ Nous allons approfondir notre analyse dans le type **RPG** en essayant de sépar
 
 Voici la répartition des joueurs jouant à des MMORPG et des joueurs de RPG classique :
 
-```{r mmo_vs_classicRPG, fig.align='center'}
+```{r MMO vs Classic RPG, fig.align='center'}
 # Filtrer les jeux RPG en ligne et ajouter une colonne is_MMO
 mmo_vs_classicRPG <- jeux_en_ligne_type %>%
   filter(type_de_jeu == "RPG en ligne") %>%
@@ -1112,7 +1104,7 @@ ggplot(proportions_globales, aes(x = "", y = proportion, fill = is_MMO)) +
 
 Note :
 
--   Stardew Valley a le tag RPG et est un jeu qui peut se jouer en multijoueur mais peut-on considérer comme un jeu en ligne ? C'est le cas d'autres jeux principalement singleplayer mais qui peut se jouer en multijoueur.
+-   Stardew Valley a le tag RPG et est un jeu qui peut se jouer en multijoueur, mais peut-on le considérer comme un jeu en ligne ? C'est le cas de d'autres jeux principalement singleplayer mais qui peuvent se jouer en multijoueur.
 
 ### Limites des résultats obtenus
 
@@ -1120,19 +1112,19 @@ Note :
 
 -   D'autres visualisations au sein des catégories nous permettraient de voir qu'uniquement quelques jeux portent la base de jeu de certains types de jeux comme CS 2 pour les FPS et Dota 2 pour les MOBA.
 
--   Le fait que la catégorie **"Autres"** possèdent de nombreux jeux en ligne que l'on a pas pu classer montre que le domaine des jeux en ligne est très variée et non cantonnée aux genres que l'on pense habituellement.
-    Globalement, réaliser une classification sur l'ensemble des jeux Steam semble difficile tant certains jeux sont assez particulier pour les catégoriser.
+-   Le fait que la catégorie **"Autres"** possède de nombreux jeux en ligne que l'on a pas pu classer montre que le domaine des jeux en ligne est très varié et non cantonné aux genres auxquels on pense habituellement.
+    Globalement, réaliser une classification sur l'ensemble des jeux Steam semble difficile tant certains jeux sont assez particuliers pour les catégoriser.
 
 -   Enfin, il faut être conscient que ces données ne concernent que les utilisateurs Steam et non la globalité des joueurs.
     Par exemple, pour les MMORPG, ceux-ci peuvent être lancés hors Steam.
-    De plus avec l'avènement de l'Epic Game Store, une partie des jeux sont passés sur l'autre plateforme comme Rocket League.
+    De plus avec l'avènement de l'Epic Games Store, une partie des jeux ont quitté Steam pour passer surcette nouvelle plateforme. C'est notamment     le cas de Rocket League.
 
 ## Les jeux les plus populaires
 
-Dans cette partie, nous allons observer les jeux avec le plus de joueurs jouant en même temps.
+Dans cette partie, nous allons observer les jeux avec le plus de joueurs actifs en même temps.
 Voici les données pour le dataset que l'on a qui indique le nombre de joueurs en Octobre 2024 :
 
-```{r popular_game_chart}
+```{r Graphique des jeux les plus populaires}
 jeux_populaires <- steamData %>%
   # Enlever Wallpaper Engine car ce n'est pas un jeu...
   filter(name != 'Wallpaper Engine') %>%
@@ -1166,10 +1158,10 @@ ggplot(jeux_populaires, aes(x = reorder(name, concurrent_users_yesterday), y = c
 
 ```
 
-Pour les données plus récentes, nous avons récolté le nombre de joueurs actif sur le site [SteamDB](https://steamdb.info/charts/).
+Pour les données plus récentes, nous avons récolté le nombre de joueurs actifs sur le site [SteamDB](https://steamdb.info/charts/).
 Voici le même graphique pour Juin 2025 :
 
-```{r popular_game_june_2025_chart}
+```{r Graphique des jeux les plus populaires pour juin 2025}
 jeux_populaires_2025 <- read.csv("data/popular_games_june_2025.csv", sep = ";") %>%
     # Sélectionner les 10 premiers jeux
   arrange(desc(concurrent_users_yesterday)) %>%
@@ -1200,16 +1192,16 @@ ggplot(jeux_populaires_2025, aes(x = reorder(name, concurrent_users_yesterday), 
        y = "Nombre de joueurs actifs en simultané")
 ```
 
-### Observations :
+### Observations
 
--   Il existe 3 jeux principaux qui regroupe la majorité des utilisateurs Steam : **Counter-Strike 2**, **PUBG** et **Dota 2** avec plus de 500k joueurs.
--   On peut remarquer une augmentation significative de la base de joueurs de ces 3 jeux entre octobre 2024 et juin 2025, notamment Counter-Strike 2 qui compte 400k joueurs supplémentaire d'après nos données mais il est de 200k en réalité ([SteamDB - Page CS2](https://steamdb.info/app/730/charts/#1y))
--   Certains jeux comme **Black Myth: Wukong** ou **Liar's Bar** ont été sorti en octobre 2024, ce qui peut expliquer leur présence dans les jeux les plus populaires de Steam et leur absence dans le second graphique. La même remarque est à réaliser pour les nouveaux jeux sortis en juin 2025 comme **Stellar Blade**, **Dune: Awakening** ou **ELDEN RING NIGHTREIGN** qui viennent juste de sortir
+-   Il existe 3 jeux principaux qui regroupent la majorité des utilisateurs Steam : **Counter-Strike 2**, **PUBG** et **Dota 2** avec plus de 500k joueurs.
+-   On peut remarquer une augmentation significative de la base de joueurs de ces 3 jeux entre octobre 2024 et juin 2025, notamment Counter-Strike 2 qui compte 400k joueurs supplémentaires d'après nos données mais il est de 200k en réalité ([SteamDB - Page CS2](https://steamdb.info/app/730/charts/#1y))
+-   Certains jeux comme **Black Myth: Wukong** ou **Liar's Bar** sont sortis en octobre 2024, ce qui peut expliquer leur présence dans les jeux les plus populaires de Steam et leur absence dans le second graphique. La même remarque est à réaliser pour les nouveaux jeux sortis en juin 2025 comme **Stellar Blade**, **Dune: Awakening** ou **ELDEN RING NIGHTREIGN** qui viennent juste de sortir
 -   La présence de `Free-to-play` peut aussi expliquer la présence de **Bongo Cat** et de **Delta Force** dans le graphique de juin 2025. On note 5 jeux FTP dans le classement de 2025.
 -   En juin 2025, bien qu'ils ne fassent pas parti des 10 jeux les plus populaires, **NARAKA: BLADEPOINT** (12ème) et **Stardew Valley** (19ème) possèdent une base de joueurs assez fidèle. **Rust**, quant à lui, reste dans le classement à la 10ème place.
 -   Pour **Stardew Valley**, on peut supposer que sa promotion (-50%) en octobre lui a permis de rentrer dans le classement des jeux les plus populaires.
--   Pour **Factorio**, la raison de sa présence en octobre est dû à la sortie de son contenu additionnel `Factorio: Space Age` sortie en octobre 2024
--   Pour **Liar's Bar**, le jeu a été assez populaire en raison de nombreux streamers/youtubers qui ont réalisé du contenu sur le jeu.
+-   Pour **Factorio**, la raison de sa présence en octobre est dû à la sortie de son contenu additionnel `Factorio: Space Age` sorti en octobre 2024.
+-   Pour **Liar's Bar**, sa popularité vient de nombreux lives et vidéos réalisés par des créateurs de contenu comme sur la plateforme Twitch.
 
 ### Conclusion
 
@@ -1218,21 +1210,19 @@ On peut observer plusieurs caractéristiques communes des jeux les plus populair
 - Les jeux sont `Free-to-play`
 - Les sorties récentes de jeux ou de contenus additionnels
 - Les soldes du jeu
-- Le jeu devienne le contenu tendance des créateurs de contenu (streamers/youtubers)
+- Le jeu devient le contenu tendance des créateurs de contenu (streamers/youtubers)
 
-Le classement des jeux les populaires est assez versatile mais le top 3 reste identique avec leurs grosses bases de joueurs.
+Le classement des jeux les populaires est assez versatile, mais le top 3 reste identique même au fil des années grâce à leurs bases de joueurs conséquentes.
 
 ### Limite de l'analyse
 
-- Le nombre de joueurs récoltés de notre dataset n'est pas forcément une mesure très précise car elle enregistre le nombre de joueurs au moment de la récolte de la donnée. Or le nombre de joueurs d'un jeu varie grandement au cours d'une journée (plus de joueurs le soir et des heures creuses) et au cours de la semaine (plus de joueurs le week-end).
-
-
+- Le nombre de joueurs récoltés de notre dataset n'est pas forcément une mesure très précise car elle enregistre le nombre au moment de la récolte de la donnée. Or le nombre de joueurs d'un jeu varie grandement au cours d'une journée (plus de joueurs le soir et à des heures creuses) et au cours de la semaine (plus de joueurs le week-end).
 
 ---
 
-## Analyse des notes des jeux AAA et indies
+# Analyse des notes des jeux studio et des jeux indépendants
 
-### Introduction
+## Introduction
 
 L'industrie du jeu vidéo traverse une période compliquée depuis plusieurs années.
 Les plus grosses entreprises du milieu enchaînent les polémiques : entre licencements intensifs, management toxique et jeux très moyens aux yeux de la critique dont les prix ne cessent d'augmenter, le milieu ne cesse d'évoluer.
@@ -1248,19 +1238,19 @@ Cependant, ces productions font face à plusieurs critiques récurrentes telles 
 À l'opposé, les jeux indépendants sont souvent développés par des équipes réduites ou par des développeurs individuels disposant de moyens financiers et techniques limités.
 Ce contexte leur permet généralement une plus grande liberté créative, donnant naissance à des jeux originaux, audacieux et parfois innovants.
 
-### Problématique
+## Problématique
 
 Face à ce contexte qui oppose budget et innovation, une question se soulève quant à la qualité des jeux auprès du grand public :
 
 > Les jeux indépendants obtiennent ils de meilleures évaluations que les jeux fait par des studios ?
 
-### Chargement et préparation des données
+## Chargement et préparation des données
 
 Afin de réaliser l'analyse, on va utiliser les fichiers [raw_reviews.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/raw_reviews.csv) et [tags.csv](https://github.com/IF36-visualisation/projet-if36-p25-avatar-le-maitre-du-r/blob/master/data/tags.csv) qui seront suffisants.
 Les deux fichiers sont reliés par `app_id`, tags.csv va nous permettre de séparer les jeux par le groupe des jeux indépendants et celui des jeux studios, et raw_reviews.csv va nous permettre d'obtenir les notes attribuées pour chaque jeu.
 Dans un second temps, nous utiliseront la variable steamData qui regroupe l'ensemble des données pour faire des analyses plus précises.
 
-### Préparation des jeux
+## Préparation des jeux
 
 Steam possède un tag spécialement pour les jeux indépendants, qui se nomme "Indie".
 Ce n'est pas le cas pour les jeux de studios.
@@ -1287,12 +1277,11 @@ types_games <- bind_rows(indie_games, studio_games)
 
 Par la suite, on peut tout mettre dans un nouveau dataset nommé `types_games` qui recense l'ensemble des jeux avec leur catégorie propre.
 
-### Préparation des évaluations
+## Préparation des évaluations
 
-Pour les évaluations, on va créer un nouveau dataset avec seulement les informations dont nous avons besoin, c'est à dire `app_id` et `review_score_description`.
+Pour les évaluations, on va créer un nouveau dataset avec seulement les informations dont nous avons besoin, c'est-à-dire `app_id` et `review_score_description`.
 On va ensuite filtrer `review_score_description` afin d'obtenir seulement les jeux qui ont une évaluation.
-La colonne peut avoir d'autres valeurs, comme "None", "1 user reviews" etc...
-car Steam attribue une évaluation à un jeu seulement à partir d'un certain nombre d'évaluations de la part de la communauté.
+La colonne peut avoir d'autres valeurs, comme "None", "1 user reviews" etc... car Steam attribue une évaluation à un jeu seulement à partir d'un certain nombre d'évaluations de la part de la communauté.
 
 ```{r Récupération des évaluations}
 evaluations <- reviews %>%
@@ -1304,7 +1293,7 @@ evaluations <- reviews %>%
   inner_join(types_games, by = "app_id")
 ```
 
-### Visualisations
+## Visualisations
 
 Enfin, pour la visualisation de nos données, je me suis orienté sur un diagramme à barres.
 L'objectif est de comparer directement les types de jeu selon le niveau d'évaluation.
@@ -1358,7 +1347,7 @@ evaluations %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-### Observations
+## Observations
 
 L'analyse du graphique montre que, proportionnellement, les jeux issus de studios obtiennent légèrement plus d'évaluations "Very Positive" que les jeux indépendants.
 Toutefois, les différences restent relativement faibles, et la majorité des jeux indépendants reçoivent également des évaluations globalement positives.
@@ -1368,7 +1357,7 @@ Cela amène à nuancer l'hypothèse initiale : si les jeux indépendants reçoiv
 Cette hypothèse découle du fait qu'aujourd’hui, les joueurs se focalisent sur une petite partie du monde vidéoludique.
 De nouveaux jeux sortent chaque jour ; certains sont excellents, mais ils ne bénéficieront pas forcément de la même visibilité que les jeux colossaux développés par les grandes entreprises, comme Microsoft, Ubisoft, Activision Blizzard, Rockstar, etc.
 
-### Focus sur différents studios de jeux
+## Focus sur différents studios de jeux
 
 Nous allons maintenant comparer différents studios, avec d’un côté des studios produisant des jeux AAA, et de l’autre, des studios indépendants.
 Nous nous appuierons sur six studios aux profils variés :
@@ -1456,14 +1445,14 @@ ggplot(avg_per_studio, aes(x = reorder(studio, avg_positive_reviews), y = avg_po
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-### Observations
+## Observations
 
 Suite à cette visualisation, on peut constater que les trois studios indépendants sont ceux qui obtiennent proportionnellement le plus de notes positives.
 Ils sont suivis de près par FromSoftware.
 L'objectif ici est uniquement de constater les avis des joueurs par rapport aux jeux produits.
 Les chiffres ne sont pas équivalents, mais, par exemple, Hades, un grand jeu indépendant produit par Supergiant Games, a reçu 258 000 évaluations, un chiffre qu’aucun jeu AAA produit par les grands studios de la liste n’a atteint.
 
-### Conclusion
+## Conclusion
 
 Pour conclure, non, les jeux indépendants n’obtiennent pas nécessairement de meilleures notes que ceux produits par les gros studios.
 On peut toutefois constater qu’une forme de méritocratie s’est installée dans l’esprit des joueurs : ils font beaucoup de bruit pour des jeux indépendants excellents, et de même pour dénoncer des jeux à gros budget jugés médiocres.
@@ -1471,30 +1460,32 @@ Il n’est pas normal qu’avec des moyens colossaux, certaines entreprises livr
 
 ------------------------------------------------------------------------
 
-## Tendance des jeux sortis récemments (Jules PERRIN)
-# Contexte général
-Steam est une plateforme qui propose l'un des plus gros catalogue de jeux vidéo du marché. Chaque jeu proposé a plusieurs caractéristiques (nom, prix, éditeur , etc). Parmi ces caractéristiques, l'une d'entre elle nous intéresse particulièrement dans ce rapport. En effet les tags permettent aux joueurs de se faire une idée rapide des jeux proposés ou encore de rechercher de nouveaux jeux selon leur préférences.
+# Tendance des jeux sortis récemment
+
+## Contexte général
+
+Parmi les caractéristiques d'un jeu Steam, l'une d'entre elle nous intéresse particulièrement dans ce rapport. En effet les tags permettent aux joueurs de se faire une idée rapide des jeux proposés ou encore de rechercher de nouveaux jeux selon leurs préférences.
 
 Le jeu de données que nous allons utiliser ne comporte pas de données permettant de dresser une temporalité. Ce rapport portera donc sur les données du catalogue Steam en octobre 2024.
 
-Les catégories ne doivent pas être confondues avec les tags. Ici les catégories représentent comment l'on joue au jeu (multiplayer, online pvp, remote play on phone etc). Alors que les tags représentent à quoi l'on joue (survival, tactical, FPS, old school, etc). 
+Les catégories ne doivent pas être confondues avec les tags. Ici, les catégories représentent comment on joue au jeu (multiplayer, online pvp, remote play on phone etc), alors que les tags représentent le type de jeu (survival, tactical, FPS, old school, etc). 
 
-# Problématique
+## Problématique
 
 Ce rapport traitera une question pour le moment: 
 
  - Quelle est la tendance des jeux sortis récemment ?
  
-Cela nous permettra d'avoir une idée globale de la dispersion des joueurs dans les catégories majeurs sur steam pour les nouveaux jeux. Pourrait être utile à un studio pour orienter son futur jeux vidéo par example. 
+Cela nous permettra d'avoir une idée globale de la répartition des joueurs dans les catégories majeures sur Steam pour les nouveaux jeux. Cette analyse pourrait être utile à un studio pour orienter son futur jeu vidéo par exemple. 
  
-# Analyse
-## Import des données
+## Analyse
 
-Premièrement il faut importer les données nécessaires à cette analyse.
-Ainsi que charger les librairies requises pour travailler et visualiser les données
-Les données des fichiers tags, steamspy et games sont nécéssaires
+### Import des données
 
-```{r importe, message=FALSE, warning=FALSE}
+Premièrement il faut importer les données nécessaires à cette analyse, ainsi que charger les librairies requises pour travailler et visualiser les données.
+Nous allons utiliser les données des fichiers `tags`, `steamspy` et `games`.
+
+```{r Import, message=FALSE, warning=FALSE}
 library(tidyr)
 library(scales)
 library(lubridate)
@@ -1508,9 +1499,9 @@ games <- read_delim("data/clean_games.csv", delim=";", show_col_types = FALSE)
 
 ### Précision et définition
 
-Ici on cherche à représenter la tendance actuelle. On utilisera donc la population steam présente le jour de la construction du dataset (bien que pas objectivement représentatif cf. interprétation). On cherche également à se concentrer sur les jeux récents. On utilisera donc tous les jeux sortis en 2024
+Ici, on cherche à représenter la tendance actuelle. On utilisera donc la population Steam présente le jour de la construction du dataset (bien que pas objectivement représentatif cf. interprétation). On cherche également à se concentrer sur les jeux récents. On utilisera donc tous les jeux sortis en 2024.
 
-```{r}
+```{r Tags les plus populaires de 2024}
 games_2024 <- games %>%
   mutate(release_date = ymd(release_date)) %>%
   filter(year(release_date) == 2024) %>%
@@ -1535,12 +1526,13 @@ tag_players %>%
   )
 ```
 
-Voila donc un aperçu des tags les plus populaires selon le contexte établi
-## meilleur tags
+Voilà un aperçu des tags les plus populaires selon le contexte établi.
+
+## Meilleurs tags
 
 ### Visualisation
 
-```{r}
+```{r Meilleur tag de l\'année}
 ggplot(tag_players, 
        aes(x = reorder(tag, total_ccu), 
            y = total_ccu)) +
@@ -1557,28 +1549,19 @@ ggplot(tag_players,
 
 ### Interprétation
 
-On peut observer des tags assez génériques néanmoins on peut s'interroger sur la présence d'early access. Est ce que cette position dans les tags résulte de la curiosité des joueurs pour les jeux "non sortis" en général. Ou bien est-ce qu'un triple A était très attendu et est sorti en early acces en 2024.
+On peut observer des tags assez génériques. Néanmoins on peut s'interroger sur la présence d'early access. Est ce que cette position dans les tags résulte de la curiosité des joueurs pour les jeux "non sortis" en général ? Ou bien est-ce qu'un triple A était très attendu et est sorti en early acces en 2024 ?
 
-On peut également observer que les jeux multi et single player se valent mais cette interprétation est à nuancer car les jeux peuvent avoir les 2 tags de par la présence d'une campagne ou d'un mode histoire.
+On peut également observer que les jeux multiplayer et singleplayer se valent, mais cette interprétation est à nuancer car les jeux peuvent avoir les 2 tags en même temps à cause de la présence d'une campagne ou d'un mode histoire.
 
-Les jeux en Coop sont significativement au delà des jeux coop online. Cela pourrait se traduire par l'envie des joueurs de jouer uniquement avec leurs amis ou au moins de ne pas jouer avec des gens aléatoire qui pourraientt avoir un écart de niveau important ou juste vouloir "troller". au demeurant, les jeux coop n'ont pas forcement de mode en ligne
-
+Les jeux en Coop sont significativement au delà des jeux coop online. Cela pourrait se traduire par l'envie des joueurs de jouer uniquement avec leurs amis ou au moins de ne pas jouer avec des gens aléatoires qui pourraientt avoir un écart de niveau important ou juste vouloir "troller". Les jeux coop n'ont pas forcément de mode en ligne.
 
 ## Meilleures catégories
-Dans cette partie on se concentrera uniquement sur les catégories de jeux. Mais également sur tout l'historique des nombre de possesseurs contrairement au graphique précédent ou l'on évoquait les joueurs connectés.Les données utilisé portent sur les jeux de toutes les années de notre datasets
+
+Dans cette partie, on se concentrera uniquement sur les catégories de jeux, mais également sur tout l'historique des nombres de possesseurs contrairement au graphique précédent où l'on évoquait les joueurs connectés. Les données utilisées portent sur les jeux de toutes les années de notre dataset.
 
 ### Visualisation
 
-```{r}
-#caté les plus populaires sur steam
-# Nécessite les packages suivants :
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(ggplot2)
-
-
-
+```{r Top 50 des catégories Steam par nombre minimal de possesseurs}
 library(scales)
 # Jointure des catégories et données de popularité
 cat_pop <- left_join(steamspy, categories, by = "app_id")
@@ -1617,27 +1600,21 @@ ggplot(top50_cat, aes(x = reorder(categories, total_owner_min), y = total_owner_
     axis.title.x = element_text(size = 10),
     axis.title.y = element_text(size = 10)
   )
-
-
 ```
 
 ### Interprétation
-On peut voir que premierement que les catégories les plus présente sont très générique. Cela peut s'expliquer du fait qu'elle sont présente sur énormément de jeux qu'elle que soit leurs autre catégories. Typiquement on ne vois pas de catégories spécifique comme "farm" ou "war" par exemple. 
 
+On peut voir que premièrement, les catégories les plus présentes sont très génériques. Cela peut s'expliquer du fait qu'elles sont présentes sur énormément de jeux quelque soit leurs autres catégories. Typiquement on ne voit pas de catégories spécifiques comme "farm" ou "war" par exemple. 
 
-##Evolution des tags
-Dans cette partie on reviendra sur les tags les plus présents en fonction des années de sortie. Pour cela on prend les 10 tags les plus utilisé globalement et on regade leurs évolution.
+## Évolution des tags
+
+Dans cette partie on reviendra sur les tags les plus présents en fonction des années de sortie. Pour cela, on prend les 10 tags les plus utilisés globalement et on regade leurs évolutions.
 
 ### Visualisation
-Le premier graphique représente toute la période du dataset. Les deux suivant son des focus sur les période avant et après 2013
 
-```{r}
+Le premier graphique représente toute la période du dataset. Les deux suivants sont des focus sur les périodes avant et après 2013.
 
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(lubridate)
-
+```{r Évolution du nombre de jeux sortis par tag}
 # Préparation des données de base
 games_tags <- left_join(tags, clean_games %>% select(app_id, release_date), by = "app_id") %>%
   filter(!is.na(tag), !is.na(release_date)) %>%
@@ -1660,7 +1637,7 @@ ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
   geom_line(linewidth = 1.1) +
   geom_point(size = 1.6) +
   labs(
-    title = "Évolution du nombre de jeux sortis par tag ",
+    title = "Évolution du nombre de jeux sortis par tag",
     x = "Année de sortie",
     y = "Nombre de jeux sortis",
     color = "Tag"
@@ -1719,21 +1696,23 @@ ggplot(genre_year_post2015_top, aes(x = year, y = n, color = tag)) +
     color = "Tag"
   ) +
   steam_theme 
-
 ```
 
 ### Interprétation
-Sur le graphique global on voit une explosion du nombre de jeux en 2013. Une explication probable est la sortie de la PS4 et Xbox One cette année là. Les éditeurs se sont peut être concentré sur des version pc plutot que sur des édition console qui aurait touché une population plus faible de joueurs. 
 
-Quand au tag en eux-même, on remarque une forte ascencion des jeux independant ainsi que des jeux single player notamment sur l'année 2020 et 2021. Cette augementation des jeux single player pourrait être expliqué par le covid. Tous les "petit jeux" pouvais être des jeux rapide à développer pour les studio pour répondre à une demande immédiate.
+Sur le graphique global, on observe une explosion du nombre de jeux en 2013. Une explication probable est la sortie de la PS4 et de la Xbox One cette année-là. Les éditeurs se sont peut-être concentrés sur des versions PC plutôt que console, ces dernières touchant alors une population de joueurs plus restreinte.
 
-Sur les deux grap de focus, on peut remarquer une croissance assez stable grace à cette séparation.
+Quant aux tags eux-mêmes, on remarque une forte ascension des jeux indépendants ainsi que des jeux solo, notamment en 2020 et 2021. Cette augmentation des jeux solo pourrait s’expliquer par la pandémie de Covid-19. Tous les « petits jeux » pouvaient être rapidement développés par les studios pour répondre à une demande immédiate.
+
+Sur les deux graphiques de focus, on peut remarquer une croissance assez stable grâce à cette segmentation.
 
 ### Correlation tag-grosse sortie
-Cette dernière partie visera à déterminé si un jeu best seller peu influencer ces tags ou est ce que c'est plutôt un tendance global qui influait ces tags
+
+Cette dernière partie vise à déterminer si un jeu best-seller peut influencer ces tags ou si c'est plutôt une tendance globale qui influe sur ces tags.
 
 ### Visualisation
-```{r}
+
+```{r Évolution des tags}
 # 1. Préparation des données
 games_tags <- left_join(tags, clean_games %>% select(app_id, release_date), by = "app_id") %>%
   filter(!is.na(tag), !is.na(release_date)) %>%
@@ -1878,22 +1857,22 @@ ggplot(genre_year_post2013_top, aes(x = year, y = n, color = tag)) +
     color = "Tag"
   ) +
   steam_theme
-
-
-
 ```
 
 ### Interprétation
-On se concentrera sur les 2 grpahiques de focus sur les périodes avant et après 2013. 
-Ici on voit apparaitre le best seller de l'année. On peut donc estimer si le jeu en question à une relation avec les jeux sorties cette année. 
 
-Par exemple certain jeux n'ont rien à voir avec les "gros" tags des jeux sorties cette année là. Par exemple Left 4 dead 1 et 2 en 2008 et 2009 se retrouve uniquement dans 2 tags (Action et multiplayer). On pourrait donc estimer que c'est un bon jeux malgré qu'il n'ai pas forcément surfer sur la vague du moment. 
-En revanche si on regarde Trove en 2015, il coche toute les cases de plusieurs des meilleur tags (3D, action, adventure, casual). 
+On se concentrera sur les deux graphiques de focus, correspondant aux périodes avant et après 2013.
+On voit ici apparaître le best-seller de chaque année. On peut donc estimer si le jeu en question entretient une relation avec les jeux sortis la même année.
 
-### Limites et attentions
+Par exemple, certains jeux n’ont rien à voir avec les principaux tags des titres publiés cette année-là. C’est le cas de Left 4 Dead 1 et 2, sortis en 2008 et 2009, qui ne sont associés qu’à deux tags : Action et Multiplayer. On peut donc estimer qu’il s’agit de bons jeux, même s’ils n’ont pas forcément surfé sur la tendance dominante du moment.
 
-Il faut absolument garder en tête que le dataset ne se base pas sur tout l'historique de steam mais bien sur une journée ce qui peut donc ne pas être représentatif à la perfection.
+En revanche, si l’on regarde Trove en 2015, celui-ci coche toutes les cases de plusieurs des meilleurs tags de l’année (3D, Action, Adventure, Casual).
 
-Les résultat présents sont limités par le fait que beaucoup de jeux peuvent avoir plusieurs tags et donc compter plusieurs fois et biaiser les résultat. Ici impossible de faire la distcntion car il n'y a pas de hiérarchisation des tags. Néamoins une possibilité pourrait être de donner un poids aà certains tags trop générique pour observer des résultat plus axé sur le theme du jeux en lui même (military plutot que multiplayer)
+### Limites et avertissements
 
-Nous sommes également limité par l'explicité des tags, par exemple, Coop online est-il réservé au jeux qui proposent un matchmaking ou aux jeux permettant d'invité ses amis ou les deux. Ces petites imprécision affecte également la pertinence de l'analyse.
+Il faut absolument garder en tête que le dataset ne se base pas sur l’ensemble de l’historique de Steam, mais uniquement sur une journée. Il peut donc ne pas être parfaitement représentatif.
+
+Les résultats présentés sont limités par le fait que de nombreux jeux possèdent plusieurs tags, ce qui peut entraîner des comptages multiples et biaiser les résultats. Il est ici impossible de faire une distinction claire, car il n’existe pas de hiérarchisation des tags.
+Néanmoins, une solution pourrait être d’attribuer un poids moindre à certains tags trop génériques, afin d’obtenir des résultats plus centrés sur la thématique réelle du jeu (par exemple, Military plutôt que Multiplayer).
+
+Nous sommes également limités par le manque de clarté de certains tags. Par exemple : Coop online désigne-t-il uniquement les jeux avec matchmaking, ceux permettant d’inviter des amis, ou bien les deux ? Ces imprécisions affectent également la pertinence de l’analyse.
