@@ -1117,7 +1117,7 @@ Note :
 
 -   Enfin, il faut être conscient que ces données ne concernent que les utilisateurs Steam et non la globalité des joueurs.
     Par exemple, pour les MMORPG, ceux-ci peuvent être lancés hors Steam.
-    De plus avec l'avènement de l'Epic Games Store, une partie des jeux ont quitté Steam pour passer surcette nouvelle plateforme. C'est notamment     le cas de Rocket League.
+    De plus avec l'avènement de l'Epic Games Store, une partie des jeux ont quitté Steam pour passer sur cette nouvelle plateforme. C'est notamment le cas de Rocket League.
 
 ## Les jeux les plus populaires
 
@@ -1212,7 +1212,7 @@ On peut observer plusieurs caractéristiques communes des jeux les plus populair
 - Les soldes du jeu
 - Le jeu devient le contenu tendance des créateurs de contenu (streamers/youtubers)
 
-Le classement des jeux les populaires est assez versatile, mais le top 3 reste identique même au fil des années grâce à leurs bases de joueurs conséquentes.
+Le classement des jeux les populaires est assez versatile, mais le top 3 reste identique même au fil des années grâce à une base de joueurs conséquente.
 
 ### Limite de l'analyse
 
@@ -1506,12 +1506,6 @@ Premièrement il faut importer les données nécessaires à cette analyse, ainsi
 Nous allons utiliser les données des fichiers `tags`, `steamspy` et `games`.
 
 ```{r Import, message=FALSE, warning=FALSE}
-library(tidyr)
-library(scales)
-library(lubridate)
-library(ggplot2)
-library(tidyverse)
-
 steamspy <- read_csv("data/steamspy.csv")
 tags <- read_csv("data/tags.csv")
 games <- read_delim("data/clean_games.csv", delim=";", show_col_types = FALSE)
@@ -1582,7 +1576,6 @@ Dans cette partie, on se concentrera uniquement sur les catégories de jeux, mai
 ### Visualisation
 
 ```{r Top 50 des catégories Steam par nombre minimal de possesseurs}
-library(scales)
 # Jointure des catégories et données de popularité
 cat_pop <- left_join(steamspy, categories, by = "app_id")
 
