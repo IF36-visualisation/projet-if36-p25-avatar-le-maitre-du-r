@@ -90,6 +90,12 @@
     line-height: 2.85rem;
   }
   
+  .figcaption {
+    text-align: center;
+    font-style: italic;
+    margin-top: 15px;
+  }
+  
   #membres-du-groupe {
     margin-bottom: 2rem;
   }

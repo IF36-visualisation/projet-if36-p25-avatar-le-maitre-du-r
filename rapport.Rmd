@@ -921,7 +921,7 @@ La première, la plus évidente, c'est que nos données contiennent uniquement l
 
 L'autre limite qui concerne nos données est qu'aujourd'hui en 2025 le prix du jeu n'est plus du tout le seul moyen pour les développeurs de rentabiliser leurs jeux. Les micro-transactions avec les achats intégrés ou encore les DLC (extension d'un jeu payant) sont des stratégies aujourd'hui largement déployées. Malheuresement, nos datasets ne disposent pas de ces données (impossible à récupérer depuis les interfaces ou outils de Steam).
 
-### ------------------------------------------------------------------------
+---
 
 # Types de jeux en ligne
 
@@ -1295,6 +1295,8 @@ evaluations <- reviews %>%
 
 ## Visualisations
 
+### Avec ggplot2
+
 Enfin, pour la visualisation de nos données, je me suis orienté sur un diagramme à barres.
 L'objectif est de comparer directement les types de jeu selon le niveau d'évaluation.
 
@@ -1347,6 +1349,14 @@ evaluations %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+### Avec Shiny
+
+Pour avoir une vue avancée des résultats, nous avons conçu l'application shiny sur la thématique de cette partie. Dans l'onglet "Graphique", on peut retrouver un encadré "Filtres" qui permet à l'utilisateur de définir le type de jeu qu'il souhaite analyser (studio ou indépendant) en direct, mais surtout de dire s'il veut le résultat en nombre ou en pourcentage ainsi que d'activer les "Non Évaluation".
+
+![Avis des jeux indépendants](img/shiny_inde.png)
+
+![Avis des jeux studios](img/shiny_studio.png)
+
 ## Observations
 
 L'analyse du graphique montre que, proportionnellement, les jeux issus de studios obtiennent légèrement plus d'évaluations "Very Positive" que les jeux indépendants.
@@ -1356,6 +1366,8 @@ Cela amène à nuancer l'hypothèse initiale : si les jeux indépendants reçoiv
 
 Cette hypothèse découle du fait qu'aujourd’hui, les joueurs se focalisent sur une petite partie du monde vidéoludique.
 De nouveaux jeux sortent chaque jour ; certains sont excellents, mais ils ne bénéficieront pas forcément de la même visibilité que les jeux colossaux développés par les grandes entreprises, comme Microsoft, Ubisoft, Activision Blizzard, Rockstar, etc.
+
+En faisant l'application Shiny, je me suis aussi rendu compte qu'enfait une grande partie des jeux Steam ne possèdent pas d'évaluations. Comme expliqué plus haut, pour que Steam puisse attribuer un des 5 types principaux d'avis, il faut au minimum un certain nombre d'avis. Si ce nombre n'est pas atteint, le jeu n'est pas catégorisé selon ses retours. Le nouveau type d'avis "Non Évaluation" regroupe tous ces jeux.
 
 ## Focus sur différents studios de jeux
 
@@ -1371,6 +1383,8 @@ Nous nous appuierons sur six studios aux profils variés :
 
 Maintenant que nous avons réuni des studios issus de tous les horizons, nous allons observer les évaluations obtenues pour plusieurs de leurs jeux et les comparer.
 L’objectif est d’explorer davantage la question de la notation et la potentielle influence du tag "Indie".
+
+### Avec ggplot2
 
 ```{r Focus sur 6 studios différents}
 ubisoft_games <- steamData %>%
@@ -1444,6 +1458,12 @@ ggplot(avg_per_studio, aes(x = reorder(studio, avg_positive_reviews), y = avg_po
   steam_theme +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+### Avec Shiny
+
+Dans l'onglet "Navigateur" de l'application, il est possible de chercher un développeur, que ça soit un studio ou une personne : l'entreprise qui a crée le jeu. En le sélectionnant, le tableau de bord donnera le nombre de jeux produits ainsi que les types d'avis reçus.
+
+![Détails des avis des jeux de Scott Cawthon](img/shiny_scott.png)
 
 ## Observations
 
@@ -1520,7 +1540,7 @@ tag_players <- tags %>%
 tag_players %>%
   mutate(total_ccu = formatC(total_ccu, format = "d", big.mark = " ")) %>% 
   knitr::kable(
-    col.names = c("Tags", "Joueur connectés"), 
+    col.names = c("Tags", "Joueurs connectés"), 
     caption = "Top 10 des tags pour les jeux de 2024",
     align = c("l", "r")
   )
@@ -1532,7 +1552,7 @@ Voilà un aperçu des tags les plus populaires selon le contexte établi.
 
 ### Visualisation
 
-```{r Meilleur tag de l\'année}
+```{r Meilleurs tags de l\'année}
 ggplot(tag_players, 
        aes(x = reorder(tag, total_ccu), 
            y = total_ccu)) +
@@ -1540,10 +1560,10 @@ ggplot(tag_players,
          coord_flip() + 
          scale_y_continuous(labels = comma) + 
          geom_text(aes(label = comma(total_ccu)),
-                   hjust = -0.1, size = 3) + 
-         labs(title = "Meilleur tag de l'année", 
+                   hjust = -0.1, size = 3, color = 'white' ) + 
+         labs(title = "Meilleurs tags de l'année", 
               x = NULL,
-              y = "joueur connecté a la création du dataset") + 
+              y = "Joueurs connectés à la création du dataset") + 
          steam_theme 
 ```
 
@@ -1801,7 +1821,7 @@ ggplot(genre_year_all_top, aes(x = year, y = n, color = tag)) +
   geom_text(
     data = top_game_all_label,
     aes(x = year, y = y_max, label = stringr::str_trunc(name, 15, "right")),
-    color = "black",
+    color = "white",
     angle = 90, vjust = -0.5, hjust = 0, size = 2.7
   ) +
   labs(
@@ -1824,7 +1844,7 @@ ggplot(genre_year_pre2013_top, aes(x = year, y = n, color = tag)) +
   geom_text(
     data = top_game_pre2013_label,
     aes(x = year, y = y_max, label = stringr::str_trunc(name, 15, "right")),
-    color = "black",
+    color = "white",
     angle = 90, vjust = -0.5, hjust = 0, size = 2.7
   ) +
   labs(
@@ -1847,7 +1867,7 @@ ggplot(genre_year_post2013_top, aes(x = year, y = n, color = tag)) +
   geom_text(
     data = top_game_post2013_label,
     aes(x = year, y = y_max, label = stringr::str_trunc(name, 15, "right")),
-    color = "black",
+    color = "white",
     angle = 90, vjust = -0.5, hjust = 0, size = 2.7
   ) +
   labs(
